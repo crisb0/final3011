@@ -1,0 +1,134 @@
+<!--<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta class="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>qt3.14</title>
+	<link rel='stylesheet' href={{url_for('static', filename='style.min.css')}} />
+	<link rel='stylesheet' href={{url_for('static', filename='goals.css')}} />
+</head>
+
+<body>-->
+
+		<!-- navbar -->
+		<!--<div class="navbar">
+			<nav class="nav__mobile"></nav>
+			<div class="container">
+				<div class="navbar__inner">
+					<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
+					<nav class="navbar__menu">
+						<ul>
+							<li><a href="{{url_for('trackCampaigns')}}">Track campaigns</a></li>
+							<li><a href="{{url_for('createCampaign')}}">Add campaign</a></li>
+							<li><a href="{{url_for('index')}}">Logout</a></li>
+						</ul>
+					</nav>
+					<div class="navbar__menu-mob"><a href="" id='toggle'><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg></a></div>
+				</div>
+			</div>
+		</div>>-->
+
+{% extends "layout.html" %}
+{% block body %}
+<div class="app">
+	<div class="container">		
+		<div class="app__inner ">
+		
+			<div class=" col-lg-5 goals">
+				<!--<div class="container">-->
+				<div class="card">
+				<h1 class="goals-title">Create a campaign</h1>
+					<div class="goals-inner">
+					<div class="row main">
+						<div class="main-form main-center">
+							<ul class="goal_form">
+								<form class="form" action="{{url_for('createCampaign')}}", method = "POST">
+
+									<div class="form-group">
+										<label for="page">Start Date</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input class="form-control rounded" type="date" value="2018-01-01" name="start_date" style="width:100%"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">End Date</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input class="form-control rounded" type="date" value="2018-01-01" name="end_date" />
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Percentage increase in Facebook page likes</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 class="form-control rounded" name="facebook_likes" placeholder="Enter a goal for Facebook Page Likes" />
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average number of post comments</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 class="form-control rounded" name="comment_count" placeholder="Enter a goal for post comments" />
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average number Facebook page likes per post</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 class="form-control rounded" name="like_count" placeholder="Enter a goal for comment likes"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average Sentiment Score on Comments</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 max=1 class="form-control rounded" name="sentiment_score" placeholder="Enter a goal for your comments' sentiment score'"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+                                    <!--<a class="button button__accent" href="{{url_for('viewCampaign')}}">Create new campaign</a>-->
+									<button type="submit" value="Submit" class="button button__accent">Create new Campaign</button>
+
+								</form>
+							</ul>
+						</div> <!--close form-->
+					</div>	<!-- close row-->
+
+				</div>		<!-- close goals inner -->
+			</div>		<!-- close card -->
+			<!--</div>		 close container -->
+
+			<!--<div class="company-goals">
+				<div class="goals-container">
+					<div class="card" id="card-goals">
+						<h1 class="goals-title">Company Goals</h1>
+							{% for dict_item in goals %}
+								{% for key, value in dict_item.items() %}
+									<h4 class="goals-text">{{key}}:</h4>
+									<p class="goals-text">{{value}}</p>
+								{% endfor %}
+							{% endfor %}
+						</div>
+				</div>
+				<!--<img src="{{url_for('static', filename='images/undraw_creation.svg')}}">-->
+			<!--</div>			 close company goals -->
+			
+		</div>				<!-- close goals 		-->
+			<div class="col-lg-7">
+				<img src="/static/images/undraw_creation.svg" >
+			</div>
+	</div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta class="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>qt3.14</title>
+	<link rel='stylesheet' href="{{url_for('static', filename='style.min.css')}}" />
+</head>
+<body>
+	<!-- navbar -->
+	<div class="navbar">
+		<nav class="nav__mobile"></nav>
+		<div class="container">
+			<div class="navbar__inner">
+				<a href="index.html" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
+				<nav class="navbar__menu">
+					<ul>
+						<li><a href="{{url_for('index')}}">Home</a></li>
+					</ul>
+				</nav>
+				<div class="navbar__menu-mob"><a href="" id='toggle'><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg></a></div>
+			</div>
+		</div>
+	</div>
+	<!-- Authentication pages -->
+	<div class="auth">
+		<div class="container">
+			<div class="auth__inner">
+				<div class="auth__media">
+					<img src="{{url_for('static', filename='images/undraw_hello_aeia.svg')}}">
+				</div>
+				<div class="auth__auth">
+					<h1 class="auth__title">Register with Us</h1>
+					<p>Fill in the following details and we'll take care of the rest!</p>
+					<form method='post' autocompelete="new-password" role="presentation" class="form">
+                        <label>Email</label>
+                        {{ form.email }}
+                        <label>Company Name</label>
+                        {{ form.company_name }}
+                        <label>Social Media<br><div style="font-size=0.9em; color:#6C63FF;">Facebook</div></label>
+                        {{ form.company_url }}
+                        <label>Password</label>
+                        {{ form.password }}
+
+                        <button><input type=submit value=Register style="border:0;background-color:transparent;"></button>
+                        <a href="{{url_for('login')}}"><h6 class="left-align" >Already have an account? Login here.</h6></a>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/static/js/app.min.js"></script>
+</body>
+</html>

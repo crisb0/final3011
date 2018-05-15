@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Page content -->
+<div class="app">
+	<div class="container">
+		<div class="app__inner">
+			<div class="app__main">
+				<div class="text-container">
+					<h1 class="app__main__title">Track your campaigns</h1>
+					<p>Here you can track your campaigns, current or old!</p>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">#</th>
+							<th scope="col">Date Started</th>
+							<th scope="col">Date Ended</th>
+							<th scope="col">Status</th>
+							<th scope="col">% of goals reached</th>
+							<th scope="col">Partner</th>
+							<th scope="col">View</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row">1</th>
+							<td>2018-01-03</td>
+							<td>2018-12-01</td>
+							<td><span class="campaign campaign-in-progress">In Progress</span></td>
+							<td>12</td>
+							<td>N/A</td>
+							<td><a href="{{ url_for('viewCampaign') }}" class="button campaign-view">View</a></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

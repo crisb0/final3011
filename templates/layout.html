@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta class="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>TrackPants | qt3.14</title>
+    <link rel='stylesheet' href="{{url_for('static', filename='bootstrap.css')}}" />
+	<link rel='stylesheet' href="{{url_for('static', filename='style.min.css')}}" />
+	<link rel='stylesheet' href="{{url_for('static', filename='custom.css')}}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
+
+</head>
+<body>
+	<!-- navbar -->
+	<div class="navbar">
+		<nav class="nav__mobile"></nav>
+		<div class="container">
+			<div class="navbar__inner">
+				<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
+				<nav class="navbar__menu">
+					<ul>
+						<li><a href="{{url_for('trackCampaigns')}}">Track campaigns</a></li>
+						<li><a href="{{url_for('createCampaign')}}">Add campaign</a></li>
+						<li><a href="{{url_for('index')}}">Logout</a></li>
+					</ul>
+				</nav>
+				<div class="navbar__menu-mob"><a href="" id='toggle'><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg></a></div>
+			</div>
+		</div>
+	</div>
+
+{% block banner %}{% endblock %}
+<div class=page>
+{% block body %}{% endblock %}
+</div>
+
+<script src="{{ url_for('static', filename='js/app.min.js') }}" />
+<script src="https://code.jquery.com/jquery-3.1.0.min.js" />
+<script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js" />
+</body>
+</html>

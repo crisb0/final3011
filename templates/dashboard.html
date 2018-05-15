@@ -1,0 +1,112 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Page content -->
+<div class="app">
+	<div class="container">
+<!--<img class="facebook-like-icon" src="{{ url_for('static', filename='images/thumbs-up.png') }}" alt="facebook thumbs up">{{ facebook['fan_count'] }}</p>-->
+		
+		<div class="app__inner ">
+			<div class="app__menu sidenav-fixed">
+				<ul class="vMenu sidenav-content">
+					<img  class="img-rounded profile center-align" src="{{ url_for('static', filename='images/coca-cola-profile.png') }}" alt="profile image"/>
+					<li>{{facebook['PageName']}}</li>
+					<li><a href="{{facebook['website']}}"> Website</a></li>
+					<li><a href="#" class="vMenu--active">Connected Apps</a></li>
+					<ul>
+						<li><a href="#facebook">Facebook</a></li>
+						<li><a href="#"></a></li>
+					</ul>
+					
+				</ul>
+			</div>
+			<div class="app__main side-content">
+				<div class="text-container">
+					<h1 class="app__main__title">Welcome, {{facebook['PageName']}}</h1>
+					<p>Thank you for using our application, we look forward to helping you make the most you can out of your social media!</p>
+				</div>
+				<!--<div class="text-container" id="stocks">
+					<h3>Stocks</h3>
+					<p>Graph showing a one year span here. Using chart.js and a team's company returns API  https://gionkunz.github.io/chartist-js/</p>
+				</div>-->
+
+				<div class="text-container" id="Social Media">
+					<h2>Social Media</h2>
+					<div id="Facebook">
+						<h3>Facebook</h3>
+						<p>In the past year you have accumulated...</p>
+						<div class="row">
+							<div class="col-sm-3">
+							{% if 'fan_count' in facebook %}
+								<h4>{{ facebook['fan_count'] }}</h4>
+								<p>total likes</p>
+							{% endif %}
+							</div>
+							<div class="col-sm-3">
+								{% if 'num_posts' in facebook_data %}
+								<h4>{{ facebook_data['num_posts'] }}</h4>
+								<p>posts</p>
+								{% endif %}
+							</div>
+							<div class="col-sm-3">
+								{% if 'daily_posts' in facebook_data %}
+								<h4>{{ facebook_data['daily_posts'] }}</h4>
+								<p>posts per day</p>
+								{% endif %}
+							</div>
+							<div class="col-sm-3">
+								{% if 'avg_react_per_post' in facebook_data %}
+								<h4>{{ facebook_data['avg_react_per_post'] }}</h4>
+								<p>reactions per post</p>
+								{% endif %}
+							</div>
+						</div>
+						
+					</div>
+					
+					<div class="row">
+						<h4>Facebook Reactions and Sentiment Analysis</h4>
+						<div class="col-lg-4 center-align">
+							<p><br>Reactions on your posts</p>
+							<img src="{{url_for('static', filename='images/reactions.png')}}" alt="reactions"/>
+						</div>
+						<div class="col-lg-4">
+							<p><br>Sentiment Score on Comments</p>
+							<img src="{{url_for('static', filename='images/comment-sentiment-score.png')}}" alt="sentiment"/>
+						</div>
+						<div class="col-lg-4">
+							<p><br>Average Comment Sentiment Score Per Month</p>
+							<img src="{{url_for('static', filename='images/avg-comment-sentiment-month.png')}}" alt="sentiment"/>
+						</div>
+					</div>
+
+					<div class="row">
+						<h4>Your top 10 most postively reacted to posts</h4>
+						<table class="table table-striped">
+							<thead>
+								<th>#</th>
+								<th>Type</th>
+								<th>Post</th>
+								<th>Likes</th>
+								<th>Sentiment Score</th>
+							</thead>
+							<tbody>
+								{% for post in post_popularity %}
+								<tr>
+									<th>{{loop.index}}</th>
+									<td>{{post['post_type']}}</td>
+									<td>{{post['post_message']}}</td>
+									<td>{{post['post_like_count']}}</td>
+									<td>0.9</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+

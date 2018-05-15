@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- Page content -->
+<div class="app">
+	<div class="container">
+		<div class="app__inner">
+			<div class="app__main">
+				<div class="text-container">
+					<h1 class="app__main__title">Your Campaign</h1>
+                    <button>Edit</button>
+				</div>
+				<table class="table table-striped">
+					<thead>
+						<tr>
+							<th scope="col">Date Started</th>
+							<th scope="col">Date Ended</th>
+							<th scope="col">Status</th>
+							<th scope="col">% of goals reached</th>
+							<th scope="col">Partner</th>
+					</thead>
+					<tbody>
+						<tr>
+							<td>2018-01-03</td>
+							<td>2018-12-01</td>
+							<td><span class="campaign campaign-in-progress">In Progress</span></td>
+							<td>12</td>
+							<td>N/A</td>
+						</tr>
+					</tbody>
+				</table>
+
+                <h3>Goals</h3>
+                <div class="row">
+                    <h4>Facebook Reactions and Sentiment Analysis</h4>
+                    <div class="col-lg-3">
+                        <p><br>Reactions on your posts</p>
+                        <img src="{{url_for('static', filename='images/reactions.png')}}" style="height: 160px" alt="reactions"/>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><br>Sentiment Score on Comments</p>
+                        <img src="{{url_for('static', filename='images/comment-sentiment-score.png')}}" alt="sentiment"/>
+                        <p>
+                            <strong>Goal</strong>: 0.6<br>
+                            <strong>Current</strong>: 0.63
+                        </p>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><br>Percentage increase in Facebook Page likes</p>
+                        <img src="{{url_for('static', filename='images/thumbs-up.png')}}" style="height: 100px" alt="sentiment"/>
+                        <p>
+                            <strong>Goal</strong>: 10% - 1126000<br>
+                            <strong>Current</strong>: 1125139<br>
+                            <strong>Original</strong>: 1125000
+                        </p>
+                    </div>
+                    <div class="col-lg-3">
+                        <p><br>Average number of reactions per post</p>
+                        <img src="{{url_for('static', filename='images/talk.png')}}" style="height: 100px" alt="reactions"/>
+                        <p>
+                            <strong>Goal</strong>: 2000<br>
+                            <strong>Current</strong>: 1481.08
+                        </p>
+                        
+                    </div>
+                </div>
+
+                <div class="row">
+                     <h4>Facebook Page Likes Overtime</h4>
+                    <div class="content">
+                        <div id="example-line-simple-responsive" class="ct-chart ct-golden-section" data-example="LyogQWRkIGEgYmFzaWMgZGF0YSBzZXJpZXMgd2l0aCBzaXggbGFiZWxzIGFuZCB2YWx1ZXMgKi8KdmFyIGRhdGEgPSB7CiAgbGFiZWxzOiBbJzEnLCAnMicsICczJywgJzQnLCAnNScsICc2J10sCiAgc2VyaWVzOiBbCiAgICB7CiAgICAgIGRhdGE6IFsxLCAyLCAzLCA1LCA4LCAxM10KICAgIH0KICBdCn07CgovKiBTZXQgc29tZSBiYXNlIG9wdGlvbnMgKHNldHRpbmdzIHdpbGwgb3ZlcnJpZGUgdGhlIGRlZmF1bHQgc2V0dGluZ3MgaW4gQ2hhcnRpc3QuanMgKnNlZSBkZWZhdWx0IHNldHRpbmdzKikuIFdlIGFyZSBhZGRpbmcgYSBiYXNpYyBsYWJlbCBpbnRlcnBvbGF0aW9uIGZ1bmN0aW9uIGZvciB0aGUgeEF4aXMgbGFiZWxzLiAqLwp2YXIgb3B0aW9ucyA9IHsKICBheGlzWDogewogICAgbGFiZWxJbnRlcnBvbGF0aW9uRm5jOiBmdW5jdGlvbih2YWx1ZSkgewogICAgICByZXR1cm4gJ0NhbGVuZGFyIFdlZWsgJyArIHZhbHVlOwogICAgfQogIH0KfTsKCi8qIE5vdyB3ZSBjYW4gc3BlY2lmeSBtdWx0aXBsZSByZXNwb25zaXZlIHNldHRpbmdzIHRoYXQgd2lsbCBvdmVycmlkZSB0aGUgYmFzZSBzZXR0aW5ncyBiYXNlZCBvbiBvcmRlciBhbmQgaWYgdGhlIG1lZGlhIHF1ZXJpZXMgbWF0Y2guIEluIHRoaXMgZXhhbXBsZSB3ZSBhcmUgY2hhbmdpbmcgdGhlIHZpc2liaWxpdHkgb2YgZG90cyBhbmQgbGluZXMgYXMgd2VsbCBhcyB1c2UgZGlmZmVyZW50IGxhYmVsIGludGVycG9sYXRpb25zIGZvciBzcGFjZSByZWFzb25zLiAqLwp2YXIgcmVzcG9uc2l2ZU9wdGlvbnMgPSBbCiAgWydzY3JlZW4gYW5kIChtaW4td2lkdGg6IDY0MXB4KSBhbmQgKG1heC13aWR0aDogMTAyNHB4KScsIHsKICAgIHNob3dQb2ludDogZmFsc2UsCiAgICBheGlzWDogewogICAgICBsYWJlbEludGVycG9sYXRpb25GbmM6IGZ1bmN0aW9uKHZhbHVlKSB7CiAgICAgICAgcmV0dXJuICdXZWVrICcgKyB2YWx1ZTsKICAgICAgfQogICAgfQogIH1dLAogIFsnc2NyZWVuIGFuZCAobWF4LXdpZHRoOiA2NDBweCknLCB7CiAgICBzaG93TGluZTogZmFsc2UsCiAgICBheGlzWDogewogICAgICBsYWJlbEludGVycG9sYXRpb25GbmM6IGZ1bmN0aW9uKHZhbHVlKSB7CiAgICAgICAgcmV0dXJuICdXJyArIHZhbHVlOwogICAgICB9CiAgICB9CiAgfV0KXTsKCi8qIEluaXRpYWxpemUgdGhlIGNoYXJ0IHdpdGggdGhlIGFib3ZlIHNldHRpbmdzICovCm5ldyBDaGFydGlzdC5MaW5lKCcjbXktY2hhcnQnLCBkYXRhLCBvcHRpb25zLCByZXNwb25zaXZlT3B0aW9ucyk7"><svg xmlns:ct="http://gionkunz.github.com/chartist-js/ct" width="100%" height="100%" class="ct-chart-line" style="width: 100%; height: 100%;"><g class="ct-grids"><line x1="50" x2="50" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line x1="180.83333333333334" x2="180.83333333333334" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line x1="311.6666666666667" x2="311.6666666666667" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line x1="442.5" x2="442.5" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line x1="573.3333333333334" x2="573.3333333333334" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line x1="704.1666666666667" x2="704.1666666666667" y1="15" y2="490.3333740234375" class="ct-grid ct-horizontal"></line><line y1="490.3333740234375" y2="490.3333740234375" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="447.1212491122159" y2="447.1212491122159" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="403.9091242009943" y2="403.9091242009943" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="360.69699928977275" y2="360.69699928977275" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="317.4848743785511" y2="317.4848743785511" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="274.2727494673295" y2="274.2727494673295" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="231.06062455610794" y2="231.06062455610794" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="187.84849964488637" y2="187.84849964488637" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="144.63637473366475" y2="144.63637473366475" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="101.42424982244319" y2="101.42424982244319" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="58.212124911221565" y2="58.212124911221565" x1="50" x2="835" class="ct-grid ct-vertical"></line><line y1="15" y2="15" x1="50" x2="835" class="ct-grid ct-vertical"></line></g><g><g class="ct-series ct-series-a"><path d="M50,455.764C93.611,444.24,137.222,432.717,180.833,421.194C224.444,409.671,268.056,401.989,311.667,386.624C355.278,371.26,398.889,345.141,442.5,317.485C486.111,289.829,529.722,256.988,573.333,213.776C616.944,170.564,660.556,98.543,704.167,40.927" class="ct-line"></path><line x1="50" y1="455.7636740944602" x2="50.01" y2="455.7636740944602" class="ct-point" ct:value="1"></line><line x1="180.83333333333334" y1="421.1939741654829" x2="180.84333333333333" y2="421.1939741654829" class="ct-point" ct:value="2"></line><line x1="311.6666666666667" y1="386.6242742365057" x2="311.6766666666667" y2="386.6242742365057" class="ct-point" ct:value="3"></line><line x1="442.5" y1="317.4848743785511" x2="442.51" y2="317.4848743785511" class="ct-point" ct:value="5"></line><line x1="573.3333333333334" y1="213.77577459161932" x2="573.3433333333334" y2="213.77577459161932" class="ct-point" ct:value="8"></line><line x1="704.1666666666667" y1="40.92727494673295" x2="704.1766666666667" y2="40.92727494673295" class="ct-point" ct:value="13"></line></g></g><g class="ct-labels"><foreignObject style="overflow: visible;" x="50" y="495.3333740234375" width="130.83333333333334" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 1</span></foreignObject><foreignObject style="overflow: visible;" x="180.83333333333334" y="495.3333740234375" width="130.83333333333334" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 2</span></foreignObject><foreignObject style="overflow: visible;" x="311.6666666666667" y="495.3333740234375" width="130.83333333333331" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 3</span></foreignObject><foreignObject style="overflow: visible;" x="442.5" y="495.3333740234375" width="130.83333333333337" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 4</span></foreignObject><foreignObject style="overflow: visible;" x="573.3333333333334" y="495.3333740234375" width="130.83333333333337" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 5</span></foreignObject><foreignObject style="overflow: visible;" x="704.1666666666667" y="495.3333740234375" width="130.83333333333326" height="20"><span class="ct-label ct-horizontal ct-end" xmlns="http://www.w3.org/2000/xmlns/" style="width: 131px; height: 20px;">Calendar Week 6</span></foreignObject><foreignObject style="overflow: visible;" y="447.1212491122159" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">0</span></foreignObject><foreignObject style="overflow: visible;" y="403.90912420099426" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">1250</span></foreignObject><foreignObject style="overflow: visible;" y="360.69699928977275" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">2050</span></foreignObject><foreignObject style="overflow: visible;" y="317.4848743785511" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">3750</span></foreignObject><foreignObject style="overflow: visible;" y="274.2727494673295" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">5000</span></foreignObject><foreignObject style="overflow: visible;" y="231.0606245561079" x="10" height="43.21212491122159" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">6250</span></foreignObject><foreignObject style="overflow: visible;" y="187.84849964488637" x="10" height="43.212124911221565" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">7500</span></foreignObject><foreignObject style="overflow: visible;" y="144.63637473366475" x="10" height="43.21212491122162" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">8750</span></foreignObject><foreignObject style="overflow: visible;" y="101.42424982244319" x="10" height="43.212124911221565" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">1000</span></foreignObject><foreignObject style="overflow: visible;" y="58.212124911221565" x="10" height="43.21212491122162" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">1100</span></foreignObject><foreignObject style="overflow: visible;" y="15" x="10" height="43.212124911221565" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 43px; width: 30px;">1200</span></foreignObject><foreignObject style="overflow: visible;" y="-15" x="10" height="30" width="30"><span class="ct-label ct-vertical ct-start" xmlns="http://www.w3.org/2000/xmlns/" style="height: 30px; width: 30px;">1375</span></foreignObject></g></svg>
+                        </div>
+                </div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
