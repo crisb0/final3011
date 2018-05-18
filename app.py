@@ -1,5 +1,5 @@
 #!flask/bin/python3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from datetime import datetime, date
 import requests, os
 from operator import itemgetter
@@ -145,6 +145,19 @@ def all_campaigns(goals):
 @app.route('/viewCampaign')
 def viewCampaign():
     return render_template("viewCampaign.html")
+
+@app.route('/events')
+def calendar():
+    return render_template("json.html")
+
+@app.route('/data')
+def return_data():
+    start_date = request.args.get('start', '')
+    end_date = request.args.get('end', '')
+
+    with open("events.json", "r") as input_data:
+        return input_data.read()
+
 
 # add any other routes above
 
