@@ -17,11 +17,9 @@
 		<nav class="nav__mobile"></nav>
 		<div class="container">
 			<div class="navbar__inner">
-				<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
+				<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative;" />TrackPants</a>
 				<nav class="navbar__menu">
 					<ul>
-						<li><a href="{{url_for('trackCampaigns')}}">Track campaigns</a></li>
-						<li><a href="{{url_for('createCampaign')}}">Add campaign</a></li>
 						<li><a href="{{url_for('index')}}">Logout</a></li>
 					</ul>
 				</nav>

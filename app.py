@@ -142,13 +142,15 @@ def all_campaigns(goals):
     print(goals)
     return render_template("createCampaign.html", goals=goals)
 
-@app.route('/viewCampaign')
+@app.route('/viewCampaign', methods=['GET', 'POST'])
 def viewCampaign():
-    return render_template("viewCampaign.html")
+    from db_helpers import query_db
 
-@app.route('/events')
-def calendar():
-    return render_template("json.html")
+    campid = request.args.get('key')
+    
+    camp = query_db('select * from campaigns where id = %d' % int(campid), (), True);
+     
+    return render_template("viewCampaign.html", name=camp[1], descript=camp[2], start=camp[3], end=camp[4])
 
 @app.route('/data')
 def return_data():
