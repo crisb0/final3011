@@ -9,7 +9,29 @@
 					<h1 class="app__main__title">Track your campaigns</h1>
 					<p>Here you can track your campaigns, current or old!</p>
 				</div>
-				<table class="table table-striped">
+                <table class="table table-striped">
+                    <thead><tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Date Started</th>
+                        <th scope="col">Date Ended</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">% of Goals Reached</th>
+                        <th scope="col">View</th>
+                    </tr></thead>
+                    <tbody>
+                        {% for key in camps %}
+                        <tr>
+                            <th scope="row">{{ key[1] }}</th>
+                            <td>{{ key[2] }}</td>
+                            <td>{{ key[3] }}</td>
+                            <td><span class="campaign campaign-in-progress">In Progress</span></td>
+                            <td>-</td>
+                            <td><a href="{{ url_for('viewCampaign') }}" class="button campaign-view">View</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+			<!--	<table class="table table-striped">
 					<thead>
 						<tr>
 							<th scope="col">#</th>
@@ -32,7 +54,7 @@
 							<td><a href="{{ url_for('viewCampaign') }}" class="button campaign-view">View</a></td>
 						</tr>
 					</tbody>
-				</table>
+				</table> -->
 			</div>
 		</div>
 	</div>

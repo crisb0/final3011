@@ -1,5 +1,5 @@
 #!flask/bin/python3
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for
 from datetime import datetime, date
 import requests, os
 from operator import itemgetter
@@ -24,7 +24,7 @@ def load_user(id):
 
 @app.route('/')
 def index():
-    print(current_user)
+    #print(current_user)
     return render_template("index.html")
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -41,10 +41,13 @@ def login():
         if user is None:
             print('Invalid credentials')
             return redirect('/login')
-        
+
+        userid = user[0] 
         user = load_user(user[0])
+
+
         login_user(user)
-        return redirect('/dashboard')
+        return redirect(url_for('dashboard'))
 
     return render_template("auth.html", form=login_form)
 
@@ -73,24 +76,31 @@ def register():
 
 @app.route('/dashboard')
 def dashboard():
+    from db_helpers import query_db
 
-    end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
-    stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
-    facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) and user_campaigns.user_id = %d' % userid, (), True)
+    camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id)', (), False); 
+    for x in camps:
+        print(x)
+    return render_template("trackCampaigns.html", camps=camps)
 
-    total_likes = 0
-    for post in facebook['posts']:
-        total_likes += post['post_like_count']
+    #end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
+    #stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
+    #facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
 
-    facebook_data={}
-    facebook_data['num_posts'] = len(facebook['posts'])
-    facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
-    facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
+    #total_likes = 0
+    #for post in facebook['posts']:
+    #    total_likes += post['post_like_count']
 
-    # should be done by sentiment but whatever
-    post_popularity=islice(sort_posts(facebook['posts']), 10)
+    #facebook_data={}
+    #facebook_data['num_posts'] = len(facebook['posts'])
+    #facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
+    #facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
 
-    return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
+    ## should be done by sentiment but whatever
+    #post_popularity=islice(sort_posts(facebook['posts']), 10)
+
+    #return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
 
 @app.route('/trackCampaigns')
 def trackCampaigns():

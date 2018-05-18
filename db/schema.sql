@@ -10,6 +10,8 @@ create table users(
 drop table if exists campaigns;
 create table campaigns(
     id integer primary key autoincrement,
+    name char(80) not null,
+    description text not null,
     start_date string not null,
     end_date string not null,
     comments_target integer not null,
@@ -18,7 +20,7 @@ create table campaigns(
     likes_target integer not null
 );
 
-drop table is exists user_campaigns;
+drop table if exists user_campaigns;
 create table user_campaigns(
     user_id integer references user(id),
     campaign_id integer references campaign(id)
