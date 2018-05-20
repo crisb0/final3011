@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang='en'>
 <head>
-    {% block head %}
 	<meta class="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<title>TrackPants | qt3.14</title>
@@ -9,7 +8,7 @@
 	<link rel='stylesheet' href="{{url_for('static', filename='style.min.css')}}" />
 	<link rel='stylesheet' href="{{url_for('static', filename='custom.css')}}" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css" />
-    {% endblock %}
+
 </head>
 <body>
 	<!-- navbar -->
@@ -17,9 +16,11 @@
 		<nav class="nav__mobile"></nav>
 		<div class="container">
 			<div class="navbar__inner">
-				<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative;" />TrackPants</a>
+				<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
 				<nav class="navbar__menu">
 					<ul>
+						<li><a href="{{url_for('trackCampaigns')}}">Track campaigns</a></li>
+						<li><a href="{{url_for('createCampaign')}}">Add campaign</a></li>
 						<li><a href="{{url_for('index')}}">Logout</a></li>
 					</ul>
 				</nav>

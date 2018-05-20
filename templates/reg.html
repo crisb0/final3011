@@ -37,12 +37,14 @@
                         {{ form.email }}
                         <label>Company Name</label>
                         {{ form.company_name }}
-                        <label>Social Media<br><div style="font-size=0.9em; color:#6C63FF;">Facebook</div></label>
+                        <label>Company Domain</label>
                         {{ form.company_url }}
                         <label>Password</label>
                         {{ form.password }}
-
-                        <button><input type=submit value=Register style="border:0;background-color:transparent;"></button>
+                        <label>Connect to the Facebook Analytics Platform<br><div style="font-size:80%;color:red;">Please ensure you log in to the Facebook Account associated with your company!</div></label>
+                        <a href="#" class="button" style="width:100%;">Connect to Facebook</a>
+						<!--<button type='submit' class="button button__accent">Log in</button>-->
+                        <input type=submit value=Register>
                         <a href="{{url_for('login')}}"><h6 class="left-align" >Already have an account? Login here.</h6></a>
 					</form>
 				</div>

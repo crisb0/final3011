@@ -44,6 +44,15 @@
 							<ul class="goal_form">
 								<form class="form" action="{{url_for('createCampaign')}}", method = "POST">
 
+                                    Campaign name
+                                    <input type="text" name='campaign_name'>
+
+                                    Campaign description
+                                    <input type="text" name="campaign_description">
+
+                                    Tags
+                                    <input type="text" name="tags">
+
 									<div class="form-group">
 										<label for="page">Start Date</label>
 										<div class="cols-sm-10">
@@ -58,15 +67,6 @@
 										<div class="cols-sm-10">
 											<div class="input-group col-sm-10">
 												<input class="form-control rounded" type="date" value="2018-01-01" name="end_date" />
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Percentage increase in Facebook page likes</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 class="form-control rounded" name="facebook_likes" placeholder="Enter a goal for Facebook Page Likes" />
 											</div> <!--close input group -->
 										</div> <!--close col-->
 									</div>
