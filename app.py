@@ -5,7 +5,7 @@ import requests, os
 from operator import itemgetter
 from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm
-from flask_login import LoginManager, current_user, login_user, login_required
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
 
 app = Flask(__name__, static_url_path='/static')
@@ -47,6 +47,11 @@ def login():
         return redirect('/dashboard')
 
     return render_template("auth.html", form=login_form)
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
