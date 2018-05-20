@@ -1,6 +1,4 @@
-from flask_wtf import Form
-from wtforms import Form, StringField, PasswordField, validators
-
+from wtforms import Form, StringField, PasswordField, DateField, validators
 
 class LoginForm(Form):
     email = StringField('email')
@@ -11,3 +9,11 @@ class RegistrationForm(Form):
     password = PasswordField('password')
     company_name = StringField('compnay_name')
     company_url = StringField('company_url')
+
+class EventForm(Form):
+    start_date = DateField('start_date')
+    end_date = DateField('end_date')
+    event_name = StringField('event_name')
+    event_type = StringField('event_type')
+    event_description = StringField('event_description')
+
