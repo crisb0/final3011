@@ -52,6 +52,11 @@ def login():
 
     return render_template("auth.html", form=login_form)
 
+@app.route('/logout')  
+def logout():  
+    logout_user()  
+    return redirect(url_for('index'))  
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     import db_helpers
