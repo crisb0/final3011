@@ -7,6 +7,7 @@ from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
+import re
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
@@ -85,24 +86,36 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    import db_helpers
+    from db_helpers import query_db
+    
+    user = load_user(current_user.id)
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    print(user.companyFacebook)
+    print(match)
+    facebookName = match.group(1)
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(user.id))
 
+    
     end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
     stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
-    facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    facebook = displayFacebookJSON(facebookName, end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    #how you would use filterPosts
+    fb = filterPosts(campaigns[0][4], facebook)
 
     total_likes = 0
-    for post in facebook['posts']:
+    for post in fb['posts']:
         total_likes += post['post_like_count']
 
     facebook_data={}
-    facebook_data['num_posts'] = len(facebook['posts'])
+    facebook_data['num_posts'] = len(fb['posts'])
     facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
     facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
 
     # should be done by sentiment but whatever
-    post_popularity=islice(sort_posts(facebook['posts']), 10)
+    post_popularity=islice(sort_posts(fb['posts']), 10)
 
-    return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
+    return render_template("dashboard.html", company=company, facebook=fb, facebook_data=facebook_data, post_popularity=post_popularity)
 
 @app.route('/trackCampaigns')
 @login_required
@@ -241,7 +254,27 @@ def displayFacebookJSON(page, start, end, stats):
 
     if 'Website' in result:
         result['Website'] = re.sub('.*//', '', result['Website'])
+    
+    return result
 
+# input: string in the form of "x,y,a" and facebook data as a tuple
+# output: dict of facebook data 
+def filterPosts(searchQuery, facebookData):
+    #make sure query is regex friendly
+    q = re.sub(r'\s*,\s*', '|', searchQuery, flags=re.IGNORECASE)
+
+    #convert the tuple to a dict
+    result = dict(facebookData)
+    relevantPosts = list()
+
+    #filter posts to see which are relevant
+    for post in result['posts']:
+        if(re.search(q, post['post_message'], flags=re.IGNORECASE)):
+            p = dict(post)
+            relevantPosts.append(p)
+    #add our relevant posts
+    result['posts'] = relevantPosts
+    #return dict with information
     return result
 
 def subtract_years(dt, years):
