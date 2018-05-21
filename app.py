@@ -154,8 +154,6 @@ def all_campaigns(goals):
 def viewCampaign():
     import db_helpers
     campaign_id = request.args.get('campaign_id')
-    print(campaign_id)
-    print("!!!!")
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
 
     #event_form = EventForm(request.form)
@@ -169,22 +167,22 @@ def viewCampaign():
     #        event_form['end_date'],
     #        campaign_id
     #        ))
-        #return render_template('vewCampaign.html', form = event_form, events = events, campaigns=campaigns)
 
 
     #return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
     return render_template("viewCampaign.html", campaigns=campaigns)
 
-@app.route('/test')
-def calendar():
-    return render_template("json.html")
-
 @app.route('/data')
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
-
+    campaign_id = request.args.get('campaign_id')
+    print(campaign_id)
+    # import db_helpers
+    # events = db_helpers.query_db('select * from events where campaign_id = %d' % (campaign_id))
+    # print(start_date,end_date)
     with open("events.json", "r") as input_data:
+        # print(input_data.read())
         return input_data.read()
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
