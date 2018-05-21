@@ -137,7 +137,7 @@ def trackCampaigns():
    # print(now)
 
     for campaign in campaigns_list:
-        if(datetime.strptime(str(campaign[4]), "%Y-%m-%d") > now):
+        if(datetime.strptime(str(campaign[3]), "%Y-%m-%d") > now):
             campaign.append("in_progress")
         else:
             campaign.append("ended")
