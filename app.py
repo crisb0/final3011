@@ -237,6 +237,34 @@ def compareCampaigns():
         return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
     return render_template("compareCampaigns.html", c1 = [], c2 = [])
 
+@app.route('/editCampaign/<campaign_id>', methods=['GET', 'POST'])
+def editCampaign(campaign_id):
+    import db_helpers
+
+    db = db_helpers.get_db()
+    print(campaign_id)
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+    print("campaign is", campaign)
+
+    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    edit_campaign_form = request.form
+
+    if request.method == 'POST':
+        query = db_helpers.query_db('update campaigns set name = "%s", description = "%s", tags = "%s", start_date = "%s", end_date = "%s", comments_target = "%s", comments_sentiment_score = "%s", likes_target = "%s" where id=%s'%(
+            edit_campaign_form['campaign_name'],
+            edit_campaign_form['campaign_description'],
+            edit_campaign_form['tags'],
+            edit_campaign_form['start_date'],
+            edit_campaign_form['end_date'],
+            edit_campaign_form['comment_count'],
+            edit_campaign_form['sentiment_score'],
+            edit_campaign_form['like_count'],
+            campaign_id
+            ))
+        db.commit()
+        q1 = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+
+    return render_template("editCampaign.html", campaign=campaign)
 # add any other routes above
 
 #helper methods
