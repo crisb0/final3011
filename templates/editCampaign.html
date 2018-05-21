@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+{% block body %}
+<div class="app">
+	<div class="container">
+		<div class="app__inner ">
+
+			<div class=" col-lg-5 goals">
+				<!--<div class="container">-->
+				<div class="card">
+					<h1 class="app__main__title">Edit {{ campaign[0][1] }} campaign</h1>
+					<div class="goals-inner">
+					<div class="row main">
+						<div class="main-form main-center">
+							<ul class="goal_form">
+								<form class="form" action="{{url_for('editCampaign', campaign_id=campaign[0][0])}}", method = "POST">
+
+                                    Campaign name
+                                    <input type="text" name='campaign_name' value='{{ campaign[0][1] }}'>
+
+                                    Campaign description
+                                    <input type="text" name="campaign_description" value='{{ campaign[0][2] }}'>
+
+                                    Tags
+                                    <input type="text" name="tags" value='{{ campaign[0][5] }}'>
+
+									<div class="form-group">
+										<label for="page">Start Date</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input class="form-control rounded" type="date" value="{{ campaign[0][3] }}" name="start_date" style="width:100%"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">End Date</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input class="form-control rounded" type="date" value="{{ campaign[0][4] }}" name="end_date" />
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average number of post comments</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 class="form-control rounded" name="comment_count" value="{{ campaign[0][6] }}" />
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average number Facebook page likes per post</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 class="form-control rounded" name="like_count" value="{{ campaign[0][8] }}"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+
+									<div class="form-group">
+										<label for="page">Average Sentiment Score on Comments</label>
+										<div class="cols-sm-10">
+											<div class="input-group col-sm-10">
+												<input type="number" min=0 max=1 class="form-control rounded" name="sentiment_score" value="{{ campaign[0][7] }}"/>
+											</div> <!--close input group -->
+										</div> <!--close col-->
+									</div>
+									<button type="submit" value="Submit" class="button button__accent">Edit Campaign</button>
+
+								</form>
+							</ul>
+						</div> <!--close form-->
+					</div>	<!-- close row-->
+
+				</div>		<!-- close goals inner -->
+			</div>		<!-- close card -->
+			<!--</div>		 close container -->
+
+			<!--<div class="company-goals">
+				<div class="goals-container">
+					<div class="card" id="card-goals">
+						<h1 class="goals-title">Company Goals</h1>
+							{% for dict_item in goals %}
+								{% for key, value in dict_item.items() %}
+									<h4 class="goals-text">{{key}}:</h4>
+									<p class="goals-text">{{value}}</p>
+								{% endfor %}
+							{% endfor %}
+						</div>
+				</div>
+				<!--<img src="{{url_for('static', filename='images/undraw_creation.svg')}}">-->
+			<!--</div>			 close company goals -->
+
+		</div>				<!-- close goals 		-->
+			<div class="col-lg-7">
+				<img src="/static/images/undraw_creation.svg" >
+			</div>
+	</div>
+</div>
+{% endblock %}
