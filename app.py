@@ -1,13 +1,13 @@
 #!flask/bin/python3
 from flask import Flask, render_template, request, redirect, url_for
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import requests, os
 from operator import itemgetter
 from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
-
+import sentiment
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
 lm = LoginManager(app)
@@ -242,5 +242,30 @@ def sort_posts(posts):
     result = sorted(posts, key=itemgetter('post_like_count'), reverse=True)
     return result
 
+def get_week_comment(page, start, week):
+    startdate = datetime.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
+    d = timedelta(weeks=week)
+    enddate = startdate + d
+    rq_string = create_fb_request(page,startdate, enddate)
+    page_stats = requests.get(rq_string).json() 
+    text = "" 
+    if "data" in page_stats:
+        for x in page_stats["data"]:
+            if "comments" in x:
+                if "data" in x["comments"]:
+                    for y in x["comments"]["data"]:
+                        text += y["message"] + "\n" if "message" in y else ""
+
+    # sentiment analysis can only process up to 100k character 
+    return text[:100000]
+def create_fb_request(page_name, start_time, end_time):
+    access_token = os.environ.get('FB_API_KEY')
+    request_string = "https://graph.facebook.com/v2.12/%s/posts?fields=comments.since(%s).until(%s)&access_token=%s" % (page_name,start_time.timestamp(),end_time.timestamp(),access_token)
+    return request_string
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True):w
+
+#test = get_week_comment("Telstra", "2018-01-01T00:00:00Z", 20)
+#print(test)
+#print(sentiment.get_sentiment(test))
