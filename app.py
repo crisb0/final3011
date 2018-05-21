@@ -20,7 +20,7 @@ now_date = now.strftime("%Y-%m-%d")
 def load_user(id):
     from db_helpers import query_db
     user = query_db('select * from users where id = %s'%(id), (), True)
-    return User(user)
+    return User(user) if user else None
 
 @app.route('/')
 def index():
@@ -190,10 +190,10 @@ def displayFacebookJSON(page, start, end, stats):
     print(result)
     # making the time look nice
     if 'posts' in result:
-    try:
-        dt = dt.replace(year=dt.year-years)
-    except ValueError:
-        dt = dt.replace(year=dt.year-years, day=dt.day-1)
+	    try:
+	        dt = dt.replace(year=dt.year-years)
+	    except ValueError:
+	        dt = dt.replace(year=dt.year-years, day=dt.day-1)
     return dt
 
 def sort_posts(posts):
