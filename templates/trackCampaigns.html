@@ -26,13 +26,13 @@
 					<tbody>
                         {% for i in campaigns %}
 						<tr>
-                            <th scope="row">{{ i[1]}}</th>
-                            <td>{{ i[2] }}</td>
-                            <td>{{ i[3] }}</td>
+                            <th scope="row">{{ i[2]}}</th>
+                            <td>{{ i[5] }}</td>
+                            <td>{{ i[6] }}</td>
 							<td><span class="campaign campaign-in-progress">In Progress</span></td>
 							<td>12</td>
 							<td>N/A</td>
-                            <td><a href="/viewCampaign/{{ i[0] }}" class="button campaign-view">View</a></td>
+                            <td><a href="/viewCampaign/{{ i[2] }}" class="button campaign-view">View</a></td>
 						</tr>
                         {% endfor %}
 					</tbody>
