@@ -1,17 +1,16 @@
 #!flask/bin/python3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from datetime import datetime, date
 import requests, os
 from operator import itemgetter
 from itertools import islice
-from forms import LoginForm, RegistrationForm, EventForm
-from flask_login import LoginManager, current_user, login_user, logout_user, login_required
+from forms import LoginForm, RegistrationForm 
+from flask_login import LoginManager, current_user, login_user, login_required
 from user import User
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
 lm = LoginManager(app)
-lm.login_view = '/login'
 
 company = {'name':'COCA-COLA AMATIL LIMITED', 'asx':'CCL', 'fbName':'CocaColaAustralia'}
 now = datetime.now()
@@ -21,10 +20,11 @@ now_date = now.strftime("%Y-%m-%d")
 def load_user(id):
     from db_helpers import query_db
     user = query_db('select * from users where id = %s'%(id), (), True)
-    return User(user) if user else None
+    return User(user)
 
 @app.route('/')
 def index():
+    #print(current_user)
     return render_template("index.html")
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -37,21 +37,19 @@ def login():
         result = request.form
         #print('select * from users where email = %s and password = %s' % (result['email'], result['password']))
         user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
-
+        
         if user is None:
             print('Invalid credentials')
             return redirect('/login')
 
+        userid = user[0] 
         user = load_user(user[0])
+
+
         login_user(user)
-        return redirect('/dashboard')
+        return redirect(url_for('dashboard'))
 
     return render_template("auth.html", form=login_form)
-
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -64,37 +62,39 @@ def register():
     if request.method == 'POST' and registration_form.validate():
         result = request.form
         # check that the company doesn't already exist
-
+        
         # make db entry
-        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']))
+        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
 
         cur.execute(
-                 'insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])
+                 'insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']) 
                  )
         db.commit()
         return redirect('/login')
-
+    
     return render_template("reg.html", form=registration_form)
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
+    from db_helpers import query_db
 
-    end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
-    stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
-    facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) and user_campaigns.user_id = %d' % userid, (), True)
+    camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id)', (), False); 
+    for x in camps:
+        print(x)
+    return render_template("trackCampaigns.html", camps=camps)
 
-    total_likes = 0
-    for post in facebook['posts']:
-        total_likes += post['post_like_count']
+    #end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
+    #stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
+    #facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
 
-    facebook_data={}
-    facebook_data['num_posts'] = len(facebook['posts'])
-    facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
-    facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
+    #total_likes = 0
+    #for post in facebook['posts']:
+    #    total_likes += post['post_like_count']
 
-    # should be done by sentiment but whatever
-    post_popularity=islice(sort_posts(facebook['posts']), 10)
+    #facebook_data={}
+    #facebook_data['num_posts'] = len(facebook['posts'])
+    #facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
 
     return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
 
@@ -154,6 +154,7 @@ def viewCampaign(campaign_id):
     print(campaign_id)
 
     events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    campaigns = db_helpers.query_db('select * from campaigns where id = %s' % (campaign_id))
 
     event_form = EventForm(request.form)
 
@@ -166,10 +167,10 @@ def viewCampaign(campaign_id):
             event_form['end_date'],
             campaign_id
             ))
-        return render_template('vewCampaign.html', form = event_form, events = events)
+        return render_template('vewCampaign.html', form = event_form, events = events, campaigns=campaigns)
 
 
-    return render_template("viewCampaign.html", form = event_form, events = events)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
@@ -189,19 +190,6 @@ def displayFacebookJSON(page, start, end, stats):
     print(result)
     # making the time look nice
     if 'posts' in result:
-        print("POSTS HERE")
-        for i in result['posts']:
-            if 'post_created_time' in i:
-                temp = re.sub('[a-zA-Z]', ' ', i['post_created_time'])
-                temp = re.sub('\+.*$', '', temp)
-                i['post_created_time'] = temp
-
-    if 'Website' in result:
-        result['Website'] = re.sub('.*//', '', result['Website'])
-
-    return result
-
-def subtract_years(dt, years):
     try:
         dt = dt.replace(year=dt.year-years)
     except ValueError:
