@@ -7,4 +7,5 @@ class User(UserMixin):
         self.email = user_info[1]
         self.password = user_info[4] 
         self.companyName = user_info[2]
-        self.companyUrl = user_info[3]
+        self.companyWebsite = user_info[3]
+        self.companyFacebook = user_info[4]

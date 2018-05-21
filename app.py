@@ -44,7 +44,7 @@ def login():
         
         user = load_user(user[0])
         login_user(user)
-        return redirect('/dashboard')
+        return redirect('/trackCampaigns')
 
     return render_template("auth.html", form=login_form)
 
@@ -56,6 +56,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     import db_helpers
+    from db_helpers import query_db
 
     registration_form = RegistrationForm(request.form)
     db = db_helpers.get_db()
@@ -69,10 +70,14 @@ def register():
         #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
 
         cur.execute(
-                 'insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']) 
+                 'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook']) 
                  )
         db.commit()
-        return redirect('/login')
+        user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
+        user = load_user(user[0])
+        login_user(user)
+        return redirect('/trackCampaigns')
+        #return redirect('/login')
     
     return render_template("reg.html", form=registration_form)
 

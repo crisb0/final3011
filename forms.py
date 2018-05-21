@@ -7,8 +7,9 @@ class LoginForm(Form):
 class RegistrationForm(Form):
     email = StringField('email')
     password = PasswordField('password')
-    company_name = StringField('compnay_name')
-    company_url = StringField('company_url')
+    company_name = StringField('company_name')
+    company_website = StringField('company_website')
+    company_facebook = StringField('company_facebook')
 
 class EventForm(Form):
     start_date = DateField('start_date')
