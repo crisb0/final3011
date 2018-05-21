@@ -188,18 +188,50 @@ def viewCampaign():
     import db_helpers
     db = db_helpers.get_db()
     campaign_id = request.args.get('campaign_id')
-    campaigns = db_helpers.query_db('select distinct * from campaigns where id = %d' % (int(campaign_id)))
-    #get events
+
+    # get events
     events = return_events(int(campaign_id))
     #overwrite events.json
     with open("events.json", "w") as jsonFile:
         json.dump(events, jsonFile)
 
-   # print(campaigns)
-    #if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
-    #    campaign.append("in_progress")
-    #else:
-    #    campaign.append("ended")
+    user = load_user(current_user.id)
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    facebookName = match.group(1)
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+    #print(campaign)
+    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
+        campaign.append("in_progress")
+    else:
+        campaign.append("ended")
+    sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
+	
+    ###
+
+    end_date = campaign[0][4]
+    start_date = campaign[0][3]
+    stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
+
+    facebook = displayFacebookJSON(facebookName, start_date+'T00:00:00Z', end_date+'T00:00:00Z', stats)['FacebookStatisticData']
+
+    fb = filterPosts(campaign[0][5], facebook)
+
+    total_likes = 0
+    for post in fb['posts']:
+        total_likes += post['post_like_count']
+    
+    campaign_length = datetime.strptime(campaign[0][3], "%Y-%m-%d") - datetime.strptime(campaign[0][4], "%Y-%m-%d")
+    c_len = campaign_length.days
+    facebook_data={}
+    facebook_data['num_posts'] = len(fb['posts'])
+    facebook_data['daily_posts'] = round(facebook_data['num_posts']/c_len, 2)
+    facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
+
+    # should be done by sentiment but whatever
+    post_popularity=islice(sort_posts(fb['posts']), 5)
+    content = sort_posts(fb['posts'])[0]['post_type']
+    ###
+
     event_form = EventForm(request.form)
 
     if request.method == 'POST':
@@ -213,8 +245,10 @@ def viewCampaign():
              )
         query = db_helpers.query_db(q)
         db.commit()
-    #return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns, sentiments=sentiments)
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns)
+
+        return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, sentiments=sentiments, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity, content=content)
+
+        #return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns)
 
 def getval(string):
     print(string)
@@ -278,7 +312,7 @@ def editCampaign(campaign_id):
     edit_campaign_form = request.form
 
     if request.method == 'POST':
-        query = db_helpers.query_db('update campaigns set name = "%s", description = "%s", tags = "%s", start_date = "%s", end_date = "%s", comments_target = "%s", comments_sentiment_score = "%s", likes_target = "%s" where id=%s'%(
+        query = db_helpers.query_db('update campaigns set name = "%s", description = "%s", tags = "%s", start_date = "%s", end_date = "%s", comments_target = "%s", sentiment_score = "%s", likes_target = "%s" where id=%s'%(
             edit_campaign_form['campaign_name'],
             edit_campaign_form['campaign_description'],
             edit_campaign_form['tags'],
@@ -329,12 +363,14 @@ def filterPosts(searchQuery, facebookData):
     #convert the tuple to a dict
     result = dict(facebookData)
     relevantPosts = list()
-
+    print(result)
     #filter posts to see which are relevant
     for post in result['posts']:
-        if(re.search(q, post['post_message'], flags=re.IGNORECASE)):
-            p = dict(post)
-            relevantPosts.append(p)
+        print("\n\n\n")
+        if('post_message') in post:
+            if(re.search(q, post['post_message'], flags=re.IGNORECASE)):
+                p = dict(post)
+                relevantPosts.append(p)
     #add our relevant posts
     result['posts'] = relevantPosts
     #return dict with information

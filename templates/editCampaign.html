@@ -2,101 +2,126 @@
 {% block body %}
 <div class="app">
 	<div class="container">
-		<div class="app__inner ">
-
-			<div class=" col-lg-5 goals">
-				<!--<div class="container">-->
-				<div class="card">
+		<div class="app__inner">
+			<div class="app__main">
+				<div class="text-container">
 					<h1 class="app__main__title">Edit {{ campaign[0][1] }} campaign</h1>
-					<div class="goals-inner">
-					<div class="row main">
-						<div class="main-form main-center">
-							<ul class="goal_form">
-								<form class="form" action="{{url_for('editCampaign', campaign_id=campaign[0][0])}}", method = "POST">
-
-                                    Campaign name
-                                    <input type="text" name='campaign_name' value='{{ campaign[0][1] }}'>
-
-                                    Campaign description
-                                    <input type="text" name="campaign_description" value='{{ campaign[0][2] }}'>
-
-                                    Tags
-                                    <input type="text" name="tags" value='{{ campaign[0][5] }}'>
-
-									<div class="form-group">
-										<label for="page">Start Date</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input class="form-control rounded" type="date" value="{{ campaign[0][3] }}" name="start_date" style="width:100%"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">End Date</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input class="form-control rounded" type="date" value="{{ campaign[0][4] }}" name="end_date" />
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average number of post comments</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 class="form-control rounded" name="comment_count" value="{{ campaign[0][6] }}" />
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average number Facebook page likes per post</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 class="form-control rounded" name="like_count" value="{{ campaign[0][8] }}"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average Sentiment Score on Comments</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 max=1 class="form-control rounded" name="sentiment_score" value="{{ campaign[0][7] }}"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-									<button type="submit" value="Submit" class="button button__accent">Edit Campaign</button>
-
-								</form>
-							</ul>
-						</div> <!--close form-->
-					</div>	<!-- close row-->
-
-				</div>		<!-- close goals inner -->
-			</div>		<!-- close card -->
-			<!--</div>		 close container -->
-
-			<!--<div class="company-goals">
-				<div class="goals-container">
-					<div class="card" id="card-goals">
-						<h1 class="goals-title">Company Goals</h1>
-							{% for dict_item in goals %}
-								{% for key, value in dict_item.items() %}
-									<h4 class="goals-text">{{key}}:</h4>
-									<p class="goals-text">{{value}}</p>
-								{% endfor %}
-							{% endfor %}
-						</div>
+					<p>Edit your campaign and/or goals!</p>
 				</div>
-				<!--<img src="{{url_for('static', filename='images/undraw_creation.svg')}}">-->
-			<!--</div>			 close company goals -->
 
-		</div>				<!-- close goals 		-->
-			<div class="col-lg-7">
-				<img src="/static/images/undraw_creation.svg" >
+				<div class="goals col-lg-6">
+					<form class="form" action="{{url_for('editCampaign', campaign_id=campaign[0][0])}}", method = "POST">
+						<label for="campaign_name" >
+							Campaign name
+						</label>
+						<input type="text" name='campaign_name' value="{{ campaign[0][1] }}" placeholder="Add a name for your campaign" required/>
+
+						<label for="campaign_description">Campaign description</label>
+						<input type="text" name="campaign_description" value="{{ campaign[0][2] }}" placeholder="Add a description for your campaign"/>
+
+						<label for="tags" data-toggle="tooltip" data-placement="top" title="A comma separated list of words that will appear in most of your posts. The more you add, the more accurate our algorithm will be!">Tags
+							<img src="{{url_for('static', filename='images/question.svg')}}" style="height:20px; padding-left:5px" />
+						</label>
+						<input type="text" name="tags" value="{{ campaign[0][5] }}" placeholder="A list of comma separated phrases that will be common in your posts" required/>
+
+						<div class="form-group">
+							<label for="start_date">Start Date</label>
+								<div class="input-group col-sm-12">
+									<input type="date" value="" name="start_date" value="{{ campaign[0][3] }}" style="width:100%" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="end_date">End Date</label>
+								<div class="input-group col-sm-12">
+									<input type="date" value="" name="end_date" value="{{ campaign[0][4] }}" style="width:100%" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="comment_couny">Average number of comments per post</label>
+								<div class="input-group col-sm-12">
+									<input type="number" min=0 name="comment_count"  value="{{ campaign[0][6] }}" placeholder="Enter a goal for post comments" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="like_count">Average number Facebook page likes per post</label>
+								<div class="input-group col-sm-12">
+									<input type="number" min=0 name="like_count" value="{{ campaign[0][8] }}"  placeholder="Enter a goal for comment likes" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="sentiment_score" data-toggle="tooltip" data-placement="top" title="A score from 0-1 that ranks how happy people are with your content! The higher the score, the better." >
+								Sentiment Score for your Campaign
+							<img src="{{url_for('static', filename='images/question.svg')}}" style="height:20px; padding-left:5px"/>
+							</label>
+								<div class="col-sm-2 right-align">
+									<img src="{{url_for('static', filename='images/sad.svg')}}" style="height:25px;"/>
+								</div>
+								<div class="col-sm-8" style="padding-top:10px">
+									<input type="range" min="0" max="100" value="50" class="slider-rounded" id="myRange" name="sentiment_score" value="{{ campaign[0][7] }}" required/>
+								</div> <!--close input group -->
+								<div class="col-sm-2 left-align">
+									<img src="{{url_for('static', filename='images/smile.svg')}}" style="height:25px;"/>
+								</div>
+								<p class="center-align">Value: <span id="demo"></span></p>
+						</div>
+						<button type="submit" value="Submit" class="button button__accent">Edit Campaign</button>
+
+					</form>
+
+					
+				</div>	<!-- close goals 		-->
+				<div class="col-lg-6">
+					<img src="{{url_for('static', filename='images/undraw_creation.svg')}}" style="display:flex; padding-top:20%;"/>
+				</div>			
+				
 			</div>
+			
+		</div>
 	</div>
 </div>
+<style>
+	.slider-rounded {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;   
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider-rounded::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    background: rgba(108, 99, 255, 0.5);
+    cursor: pointer;
+}
+
+.slider-rounded::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: rgba(108, 99, 255, 0.5);
+    cursor: pointer;
+}
+</style>
+<script>
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = (slider.value/100);
+
+slider.oninput = function() {
+  output.innerHTML = (this.value/100);
+}
+</script>
 {% endblock %}
+
