@@ -1,4 +1,70 @@
 {% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+    <meta charset='utf-8' />
+<link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
+<link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
+<script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
+<script>
+
+    $(document).ready(function() {
+
+        $('#calendar').fullCalendar({
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaDay'
+            },
+            defaultDate: '2018-05-22',
+            eventLimit: true, // allow "more" link when too many events
+            events: {
+                url: 'data'
+            }, 
+            eventColor: '#6C63FF'
+        });
+
+    });
+
+</script>
+<style>
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-size: 14px;
+    }
+
+    #script-warning {
+        display: none;
+        background: #eee;
+        border-bottom: 1px solid #ddd;
+        padding: 0 10px;
+        line-height: 40px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 12px;
+        color: red;
+    }
+
+    #loading {
+        display: none;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    #calendar {
+        max-width: 600px;
+        min-width:300px;
+        margin: 40px auto;
+        padding: 0 10px;
+    }
+
+</style>
+{% endblock %}
+
 {% block body %}
 <!-- Page content -->
 <div class="app">
@@ -7,7 +73,7 @@
 			<div class="app__main">
 				<div class="text-container">
 					<h1 class="app__main__title">{{ campaign[0][1] }} Campaign</h1>
-                    <a href="/editCampaign/{{ campaign[0][0] }}"class="button">Edit</a>
+                    <a href="/editCampaign/{{ campaign[0][0] }}" class="button" style="line-height:1em;">Edit</a>
 				</div>
 				<table class="table table-striped">
 					<thead>
@@ -33,6 +99,41 @@
 						</tr>
 					</tbody>
 				</table>
+
+            <div style='display:flex; justify-content:space-between;'>
+                <div id='calendar' style="float:left; margin:0px; padding-top:40px; height:100%;"></div>
+
+                <div id='event-form' style="width:100%; padding-left:30px;">
+                <form class="form" action="{{url_for('viewCampaign', campaign_id=campaign[0][0])}}", method = "POST">
+
+                    Event Name
+                    <input type="text" name='event_name' style="margin:0.8em;padding:7pt 13pt;">
+                    Event Description 
+                    <input type="text" name="event_description"style="margin:0.8em;padding:7pt 13pt;">
+                    Event Type 
+                    <input type="text" name="event_type"style="margin:0.8em;padding:7pt 13pt;">
+
+                    <div class="form-group">
+                        Start Date
+                        <div class="cols-sm-10">
+                            <div class="input-group col-sm-10">
+                                <input class="form-control rounded" style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="start_date" style="width:100%"/>
+                            </div> <!--close input group -->
+                        </div> <!--close col-->
+                    </div>
+
+                    <div class="form-group">
+                        End Date
+                        <div class="cols-sm-10">
+                            <div class="input-group col-sm-10">
+                                <input class="form-control rounded"style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="end_date" />
+                            </div> <!--close input group -->
+                        </div> <!--close col-->
+                    </div>
+                    <button type="submit" value="Submit" class="button button__accent">Add New Event</button>
+
+                </form></div>
+            </div>
 
                 <h3>Goals</h3>
                 <div class="row">

@@ -1,19 +1,19 @@
 #!flask/bin/python3
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+import json
 from datetime import datetime, date, timedelta
 import requests, os
 from operator import itemgetter
 from itertools import islice
-from forms import LoginForm, RegistrationForm, EventForm
+from forms import LoginForm, RegistrationForm, EventForm 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
-import sentiment
+#import sentiment
 import re
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
 lm = LoginManager(app)
-lm.login_view = '/login'
 
 company = {'name':'COCA-COLA AMATIL LIMITED', 'asx':'CCL', 'fbName':'CocaColaAustralia'}
 now = datetime.now()
@@ -27,6 +27,7 @@ def load_user(id):
 
 @app.route('/')
 def index():
+    #print(current_user)
     return render_template("index.html")
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -39,21 +40,24 @@ def login():
         result = request.form
         #print('select * from users where email = %s and password = %s' % (result['email'], result['password']))
         user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
-
+        
         if user is None:
             print('Invalid credentials')
             return redirect('/login')
 
+        userid = user[0] 
         user = load_user(user[0])
+
+
         login_user(user)
         return redirect('/trackCampaigns')
 
     return render_template("auth.html", form=login_form)
 
-@app.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('index'))
+@app.route('/logout')  
+def logout():  
+    logout_user()  
+    return redirect(url_for('index'))  
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -67,9 +71,9 @@ def register():
     if request.method == 'POST' and registration_form.validate():
         result = request.form
         # check that the company doesn't already exist
-
+        
         # make db entry
-        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']))
+        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
 
         cur.execute(
                  'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook'])
@@ -80,7 +84,6 @@ def register():
         user = load_user(user[0])
         login_user(user)
         return redirect('/trackCampaigns')
-
 
     return render_template("reg.html", form=registration_form)
 
@@ -135,7 +138,7 @@ def trackCampaigns():
    # print(now)
 
     for campaign in campaigns_list:
-        if(datetime.strptime(campaign[3], "%Y-%m-%d") > now):
+        if(datetime.strptime(str(campaign[3]), "%Y-%m-%d") > now):
             campaign.append("in_progress")
         else:
             campaign.append("ended")
@@ -179,38 +182,62 @@ def all_campaigns(goals):
     print(goals)
     return render_template("createCampaign.html", goals=goals)
 
-@app.route('/viewCampaign/<campaign_id>', methods=['GET', 'POST'])
+@app.route('/viewCampaign', methods=['GET', 'POST'])
 @login_required
-def viewCampaign(campaign_id):
+def viewCampaign():
     import db_helpers
+    db = db_helpers.get_db()
+    campaign_id = request.args.get('campaign_id')
+    campaigns = db_helpers.query_db('select distinct * from campaigns where id = %d' % (int(campaign_id)))
+    #get events
+    events = return_events(int(campaign_id))
+    #overwrite events.json
+    with open("events.json", "w") as jsonFile:
+        json.dump(events, jsonFile)
 
-    user = load_user(current_user.id)
-    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
-    facebookName = match.group(1)
-    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
-    #print(campaign)
-    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
-        campaign.append("in_progress")
-    else:
-        campaign.append("ended")
-    sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
-    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
-
+   # print(campaigns)
+    #if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
+    #    campaign.append("in_progress")
+    #else:
+    #    campaign.append("ended")
     event_form = EventForm(request.form)
 
     if request.method == 'POST':
-        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-            event_form['event_name'],
-            event_form['event_description'],
-            event_form['event_type'],
-            event_form['start_date'],
-            event_form['end_date'],
-            campaign_id
-            ))
-        return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, sentiments=sentiments)
-
-
+        q = 'insert into events values (null, "%s", "%s", "%s", "%s", "%s", "    %s")' % (
+             getval(event_form['event_name']),
+             getval(event_form['event_description']),
+             getval(event_form['event_type']),
+             getval(event_form['start_date']),
+             getval(event_form['end_date']),
+             campaign_id
+             )
+        query = db_helpers.query_db(q)
+        db.commit()
     return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign, sentiments=sentiments)
+
+def getval(string):
+    print(string)
+    match = re.search( r'value="(.+)"', str(string))
+    return match.group(1)
+
+def return_events(campaign_id):
+    import db_helpers
+    events = db_helpers.query_db('select * from events where campaign = %s' % (campaign_id))
+    events_list = []
+    for event in events:
+        event_dict = {"title": event[1], "start": event[4], "end": event[5]}
+        events_list.append(event_dict)
+    return events_list 
+
+
+@app.route('/data')
+def return_data():
+    start_date = request.args.get('start', '')
+    end_date = request.args.get('end', '')
+    campaign_id = request.args.get('campaign_id')
+    print(campaign_id)
+    with open("events.json", "r") as input_data:
+        return input_data.read()
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 @login_required

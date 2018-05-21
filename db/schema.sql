@@ -34,7 +34,7 @@ create table events(
     event_description string not null,
     event_type string not null,
     start_date string not null,
-    end_date sting not null,
+    end_date string not null,
     campaign integer references campaign(id)
 );
 
