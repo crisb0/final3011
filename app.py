@@ -108,15 +108,26 @@ def dashboard():
 @login_required
 def trackCampaigns():
     import db_helpers
+    from db_helpers import query_db
 
     print(current_user.id)
-
-    campaigns = db_helpers.query_db('select id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
-
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
+    campaigns_list = list()
     print(campaigns)
-
-
-    return render_template("trackCampaigns.html", campaigns = campaigns)
+    for campaign in campaigns:
+        t = list(campaign)
+        #print(t)
+        campaigns_list.append(t)
+   # print(now)
+    
+    for campaign in campaigns_list:
+        if(datetime.strptime(campaign[3], "%Y-%m-%d") > now):
+            campaign.append("in_progress")
+        else:
+            campaign.append("ended")
+    #print(campaigns_list)
+    user = query_db('select * from users where id = %d' % (current_user.id), (), True)
+    return render_template("trackCampaigns.html", campaigns = campaigns_list, user = user)
 
 @app.route('/createCampaign', methods=['GET', 'POST'])
 @login_required
