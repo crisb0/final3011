@@ -29,6 +29,3 @@ def get_sentiment(text):
     score = (pos - neg_avg + 1)/2.0
 
     return score
-
-test = input("gimme something: ")
-print(get_sentiment(test))

@@ -1,13 +1,14 @@
 #!flask/bin/python3
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import requests, os
 from operator import itemgetter
 from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
+import sentiment
 import re
 
 app = Flask(__name__, static_url_path='/static')
@@ -257,6 +258,34 @@ def compareCampaigns():
         return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
     return render_template("compareCampaigns.html", c1 = [], c2 = [])
 
+@app.route('/editCampaign/<campaign_id>', methods=['GET', 'POST'])
+def editCampaign(campaign_id):
+    import db_helpers
+
+    db = db_helpers.get_db()
+    print(campaign_id)
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+    print("campaign is", campaign)
+
+    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    edit_campaign_form = request.form
+
+    if request.method == 'POST':
+        query = db_helpers.query_db('update campaigns set name = "%s", description = "%s", tags = "%s", start_date = "%s", end_date = "%s", comments_target = "%s", comments_sentiment_score = "%s", likes_target = "%s" where id=%s'%(
+            edit_campaign_form['campaign_name'],
+            edit_campaign_form['campaign_description'],
+            edit_campaign_form['tags'],
+            edit_campaign_form['start_date'],
+            edit_campaign_form['end_date'],
+            edit_campaign_form['comment_count'],
+            edit_campaign_form['sentiment_score'],
+            edit_campaign_form['like_count'],
+            campaign_id
+            ))
+        db.commit()
+        q1 = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+
+    return render_template("editCampaign.html", campaign=campaign)
 # add any other routes above
 
 #helper methods
@@ -315,5 +344,30 @@ def sort_posts(posts):
     result = sorted(posts, key=itemgetter('post_like_count'), reverse=True)
     return result
 
+def get_week_comment(page, start, week):
+    startdate = datetime.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
+    d = timedelta(weeks=week)
+    enddate = startdate + d
+    rq_string = create_fb_request(page,startdate, enddate)
+    page_stats = requests.get(rq_string).json() 
+    text = "" 
+    if "data" in page_stats:
+        for x in page_stats["data"]:
+            if "comments" in x:
+                if "data" in x["comments"]:
+                    for y in x["comments"]["data"]:
+                        text += y["message"] + "\n" if "message" in y else ""
+
+    # sentiment analysis can only process up to 100k character 
+    return text[:100000]
+def create_fb_request(page_name, start_time, end_time):
+    access_token = os.environ.get('FB_API_KEY')
+    request_string = "https://graph.facebook.com/v2.12/%s/posts?fields=comments.since(%s).until(%s)&access_token=%s" % (page_name,start_time.timestamp(),end_time.timestamp(),access_token)
+    return request_string
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True):w
+
+#test = get_week_comment("Telstra", "2018-01-01T00:00:00Z", 20)
+#print(test)
+#print(sentiment.get_sentiment(test))
