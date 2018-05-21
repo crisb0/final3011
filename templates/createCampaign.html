@@ -1,133 +1,127 @@
-<!--<!DOCTYPE html>
-<html lang='en'>
-<head>
-	<meta class="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<title>qt3.14</title>
-	<link rel='stylesheet' href={{url_for('static', filename='style.min.css')}} />
-	<link rel='stylesheet' href={{url_for('static', filename='goals.css')}} />
-</head>
-
-<body>-->
-
-		<!-- navbar -->
-		<!--<div class="navbar">
-			<nav class="nav__mobile"></nav>
-			<div class="container">
-				<div class="navbar__inner">
-					<a href="{{url_for('dashboard')}}" class="navbar__logo"><img src="{{url_for('static', filename='images/pants.svg')}}" style="height:30px; margin-right:10px; position:relative; top:5px;" />TrackPants</a>
-					<nav class="navbar__menu">
-						<ul>
-							<li><a href="{{url_for('trackCampaigns')}}">Track campaigns</a></li>
-							<li><a href="{{url_for('createCampaign')}}">Add campaign</a></li>
-							<li><a href="{{url_for('index')}}">Logout</a></li>
-						</ul>
-					</nav>
-					<div class="navbar__menu-mob"><a href="" id='toggle'><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z" class=""></path></svg></a></div>
-				</div>
-			</div>
-		</div>>-->
-
 {% extends "layout.html" %}
 {% block body %}
 <div class="app">
-	<div class="container">		
-		<div class="app__inner ">
-		
-			<div class=" col-lg-5 goals">
-				<!--<div class="container">-->
-				<div class="card">
-				<h1 class="goals-title">Create a campaign</h1>
-					<div class="goals-inner">
-					<div class="row main">
-						<div class="main-form main-center">
-							<ul class="goal_form">
-								<form class="form" action="{{url_for('createCampaign')}}", method = "POST">
-
-                                    Campaign name
-                                    <input type="text" name='campaign_name'>
-
-                                    Campaign description
-                                    <input type="text" name="campaign_description">
-
-                                    Tags
-                                    <input type="text" name="tags">
-
-									<div class="form-group">
-										<label for="page">Start Date</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input class="form-control rounded" type="date" value="2018-01-01" name="start_date" style="width:100%"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">End Date</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input class="form-control rounded" type="date" value="2018-01-01" name="end_date" />
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average number of post comments</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 class="form-control rounded" name="comment_count" placeholder="Enter a goal for post comments" />
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average number Facebook page likes per post</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 class="form-control rounded" name="like_count" placeholder="Enter a goal for comment likes"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-
-									<div class="form-group">
-										<label for="page">Average Sentiment Score on Comments</label>
-										<div class="cols-sm-10">
-											<div class="input-group col-sm-10">
-												<input type="number" min=0 max=1 class="form-control rounded" name="sentiment_score" placeholder="Enter a goal for your comments' sentiment score'"/>
-											</div> <!--close input group -->
-										</div> <!--close col-->
-									</div>
-									<button type="submit" value="Submit" class="button button__accent">Create new Campaign</button>
-
-								</form>
-							</ul>
-						</div> <!--close form-->
-					</div>	<!-- close row-->
-
-				</div>		<!-- close goals inner -->
-			</div>		<!-- close card -->
-			<!--</div>		 close container -->
-
-			<!--<div class="company-goals">
-				<div class="goals-container">
-					<div class="card" id="card-goals">
-						<h1 class="goals-title">Company Goals</h1>
-							{% for dict_item in goals %}
-								{% for key, value in dict_item.items() %}
-									<h4 class="goals-text">{{key}}:</h4>
-									<p class="goals-text">{{value}}</p>
-								{% endfor %}
-							{% endfor %}
-						</div>
+	<div class="container">
+		<div class="app__inner">
+			<div class="app__main">
+				<div class="text-container">
+					<h1 class="app__main__title">Add a campaign</h1>
+					<p>Here you can add campaigns to start tracking, add a few goals and let's see how you go against them.</p>
 				</div>
-				<!--<img src="{{url_for('static', filename='images/undraw_creation.svg')}}">-->
-			<!--</div>			 close company goals -->
-			
-		</div>				<!-- close goals 		-->
-			<div class="col-lg-7">
-				<img src="/static/images/undraw_creation.svg" >
+				
+				<div class="goals col-lg-6">
+					<form class="form" action="{{url_for('createCampaign')}}", method = "POST">
+						<label for="campaign_name" >
+							Campaign name
+						</label>
+						<input type="text" name='campaign_name' placeholder="Add a name for your campaign" required/>
+
+						<label for="campaign_description" data-toggle="tooltip" title="Disabled tooltip">Campaign description</label>
+						<input type="text" name="campaign_description" placeholder="Add a description for your campaign"/>
+
+						<label for="tags" data-toggle="tooltip" data-placement="top" title="A comma separated list of words that will appear in most of your posts. The more you add, the more accurate our algorithm will be!">Tags
+							<img src="{{url_for('static', filename='images/question.svg')}}" style="height:20px; padding-left:5px" />
+						</label>
+						<input type="text" name="tags" placeholder="A list of comma separated phrases that will be common in your posts" required/>
+
+						<div class="form-group">
+							<label for="start_date">Start Date</label>
+								<div class="input-group col-sm-12">
+									<input type="date" value="" name="start_date" style="width:100%" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="end_date">End Date</label>
+								<div class="input-group col-sm-12">
+									<input type="date" value="" name="end_date" style="width:100%" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="comment_couny">Average number of comments per post</label>
+								<div class="input-group col-sm-12">
+									<input type="number" min=0 name="comment_count" placeholder="Enter a goal for post comments" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="like_count">Average number Facebook page likes per post</label>
+								<div class="input-group col-sm-12">
+									<input type="number" min=0 name="like_count" placeholder="Enter a goal for comment likes" required/>
+								</div> <!--close input group -->
+						</div>
+
+						<div class="form-group">
+							<label for="sentiment_score" data-toggle="tooltip" data-placement="top" title="A score from 0-1 that ranks how happy people are with your content! The higher the score, the better." >
+								Sentiment Score for your Campaign
+							<img src="{{url_for('static', filename='images/question.svg')}}" style="height:20px; padding-left:5px"/>
+							</label>
+								<div class="col-sm-2 right-align">
+									<img src="{{url_for('static', filename='images/sad.svg')}}" style="height:25px;"/>
+								</div>
+								<div class="col-sm-8" style="padding-top:10px">
+									<input type="range" min="0" max="100" value="50" class="slider-rounded" id="myRange" name="sentiment_score" required/>
+								</div> <!--close input group -->
+								<div class="col-sm-2 left-align">
+									<img src="{{url_for('static', filename='images/smile.svg')}}" style="height:25px;"/>
+								</div>
+								<p class="center-align">Value: <span id="demo"></span></p>
+						</div>
+						<button type="submit" value="Submit" class="button button__accent">Create new Campaign</button>
+
+					</form>
+
+					
+				</div>	<!-- close goals 		-->
+				<div class="col-lg-6">
+					<img src="{{url_for('static', filename='images/undraw_creation.svg')}}" style="display:flex; padding-top:20%;"/>
+				</div>			
+				
 			</div>
+			
+		</div>
 	</div>
 </div>
+<style>
+	.slider-rounded {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;   
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider-rounded::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    background: rgba(108, 99, 255, 0.5);
+    cursor: pointer;
+}
+
+.slider-rounded::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: rgba(108, 99, 255, 0.5);
+    cursor: pointer;
+}
+</style>
+<script>
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.innerHTML = (slider.value/100);
+
+slider.oninput = function() {
+  output.innerHTML = (this.value/100);
+}
+</script>
 {% endblock %}
 
