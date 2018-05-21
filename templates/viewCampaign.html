@@ -17,12 +17,10 @@
                 center: 'title',
                 right: 'month,agendaWeek,agendaDay'
             },
-            defaultDate: '2014-09-12',
+            defaultDate: '2018-05-22',
             editable: true,
             eventLimit: true, // allow "more" link when too many events
-            events: {
-                url: 'data'
-            }
+            eventSources: {{ events }} 
         });
 
     });
@@ -74,6 +72,7 @@
 				<div class="text-container">
 					<h1 class="app__main__title">Your Campaign</h1>
                     <button>Edit</button>
+   <p>{{ events }}</p>
 				</div>
 				<table class="table table-striped">
 					<thead>

@@ -187,26 +187,42 @@ def viewCampaign():
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
     print("HELLO")
    # print(campaigns)
-   # if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
-   #     campaigns[0].append("in_progress")
-   # else:
-   #     campaign.append("ended")
-   # events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    #if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
+    #    campaign.append("in_progress")
+    #else:
+    #    campaign.append("ended")
+    #events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    #print("EVENTS....")
+    #print(events)
+    #print("END EVENTS...")
+    #events_list = return_events(campaign_id)
+    #events = json.dumps(events)
+    #events = json.dumps(events_list)
 
-   # event_form = EventForm(request.form)
+    event_form = EventForm(request.form)
 
-   # if request.method == 'POST':
-   #     query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-   #         event_form['event_name'],
-   #         event_form['event_description'],
-   #         event_form['event_type'],
-   #         event_form['start_date'],
-   #         event_form['end_date'],
-   #         campaign_id
-   #         ))
+    if request.method == 'POST':
+        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
+            event_form['event_name'],
+            event_form['event_description'],
+            event_form['event_type'],
+            event_form['start_date'],
+            event_form['end_date'],
+            campaign_id
+            ))
 
    # return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
-    return render_template("viewCampaign.html", campaign= campaigns)
+    return render_template("viewCampaign.html", campaign= campaigns, events=events)
+@app.route('/events')
+def return_events():
+    campaign_id = 1;
+    import db_helpers
+    events = db_helpers.query_db('select * from events where campaign = %s' % (campaign_id))
+    events_list = []
+    for event in events:
+        event_dict = {"title": event[1], "start": event[4], "end": event[5]}
+        events_list.append(event_dict)
+    return json.dumps(events_list)
 
 @app.route('/data')
 def return_data():
