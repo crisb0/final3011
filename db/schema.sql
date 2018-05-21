@@ -3,7 +3,8 @@ create table users(
     id integer primary key autoincrement,
     email string not null,
     companyName string not null,
-    companyUrl string not null,
+    companyWebsite string not null,
+    companyFacebook string not null,
     password string not null
 );
 
@@ -12,9 +13,9 @@ create table campaigns(
     id integer primary key autoincrement,
     name string not null,
     description string not null,
-    tags string not null,
     start_date string not null,
     end_date string not null,
+    tags string not null,
     comments_target integer not null,
     comments_sentiment_score float not null,
     likes_target integer not null

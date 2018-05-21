@@ -5,9 +5,10 @@ from datetime import datetime, date
 import requests, os
 from operator import itemgetter
 from itertools import islice
-from forms import LoginForm, RegistrationForm 
-from flask_login import LoginManager, current_user, login_user, login_required
+from forms import LoginForm, RegistrationForm, EventForm 
+from flask_login import LoginManager, current_user, login_user, logout_user login_required
 from user import User
+import re
 
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
@@ -48,7 +49,7 @@ def login():
 
 
         login_user(user)
-        return redirect(url_for('dashboard'))
+        return redirect('/trackCampaigns')
 
     return render_template("auth.html", form=login_form)
 
@@ -60,6 +61,7 @@ def logout():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     import db_helpers
+    from db_helpers import query_db
 
     registration_form = RegistrationForm(request.form)
     db = db_helpers.get_db()
@@ -73,52 +75,75 @@ def register():
         #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
 
         cur.execute(
-                 'insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']) 
+                 'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook'])
                  )
         db.commit()
-        return redirect('/login')
-    
+        #log in user straight away
+        user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
+        user = load_user(user[0])
+        login_user(user)
+        return redirect('/trackCampaigns')
+
     return render_template("reg.html", form=registration_form)
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    import db_helpers
     from db_helpers import query_db
+    
+    user = load_user(current_user.id)
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    print(user.companyFacebook)
+    print(match)
+    facebookName = match.group(1)
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(user.id))
 
-    #campaigns = query_db('select distinct id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
-    campaigns = query_db('select distinct * from user_campaigns join campaigns on user_campaigns.campaign_id=campaigns.id where user_id = %s'%(current_user.id))
-    print(campaigns)
-    return render_template("trackCampaigns.html", campaigns = campaigns)
-    #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) and user_campaigns.user_id = %d' % userid, (), True)
-    #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id)', (), False); 
-    #for x in camps:
-    #    print("!!!")
-    #    print(x)
-    #return render_template("trackCampaigns.html", camps=camps)
+    
+    end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
+    stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
+    facebook = displayFacebookJSON(facebookName, end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    #how you would use filterPosts
+    fb = filterPosts(campaigns[0][4], facebook)
 
-    #end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
-    #stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
-    #facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    total_likes = 0
+    for post in fb['posts']:
+        total_likes += post['post_like_count']
 
-    #total_likes = 0
-    #for post in facebook['posts']:
-    #    total_likes += post['post_like_count']
+    facebook_data={}
+    facebook_data['num_posts'] = len(fb['posts'])
+    facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
+    facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
 
-    #facebook_data={}
-    #facebook_data['num_posts'] = len(facebook['posts'])
-    #facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
+    # should be done by sentiment but whatever
+    post_popularity=islice(sort_posts(fb['posts']), 10)
 
-    #return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
+    return render_template("dashboard.html", company=company, facebook=fb, facebook_data=facebook_data, post_popularity=post_popularity)
 
 @app.route('/trackCampaigns')
 @login_required
 def trackCampaigns():
     import db_helpers
+    from db_helpers import query_db
 
-    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
-    print("!!!")
+    print(current_user.id)
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
+    campaigns_list = list()
     print(campaigns)
-    return render_template("trackCampaigns.html", campaigns = campaigns)
+    for campaign in campaigns:
+        t = list(campaign)
+        #print(t)
+        campaigns_list.append(t)
+   # print(now)
+
+    for campaign in campaigns_list:
+        if(datetime.strptime(campaign[3], "%Y-%m-%d") > now):
+            campaign.append("in_progress")
+        else:
+            campaign.append("ended")
+    #print(campaigns_list)
+    user = query_db('select * from users where id = %d' % (current_user.id), (), True)
+    return render_template("trackCampaigns.html", campaigns = campaigns_list, user = user)
 
 @app.route('/createCampaign', methods=['GET', 'POST'])
 @login_required
@@ -160,22 +185,26 @@ def viewCampaign():
     import db_helpers
     campaign_id = request.args.get('campaign_id')
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
+    #print(campaign)
+    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
+        campaign.append("in_progress")
+    else:
+        campaign.append("ended")
+    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
 
-    #event_form = EventForm(request.form)
+    event_form = EventForm(request.form)
 
-    #if request.method == 'POST':
-    #    query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-    #        event_form['event_name'],
-    #        event_form['event_description'],
-    #        event_form['event_type'],
-    #        event_form['start_date'],
-    #        event_form['end_date'],
-    #        campaign_id
-    #        ))
+    if request.method == 'POST':
+        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
+            event_form['event_name'],
+            event_form['event_description'],
+            event_form['event_type'],
+            event_form['start_date'],
+            event_form['end_date'],
+            campaign_id
+            ))
 
-
-    #return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
-    return render_template("viewCampaign.html", campaigns=campaigns)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
 
 @app.route('/data')
 def return_data():
@@ -183,16 +212,33 @@ def return_data():
     end_date = request.args.get('end', '')
     campaign_id = request.args.get('campaign_id')
     print(campaign_id)
-    # import db_helpers
-    # events = db_helpers.query_db('select * from events where campaign_id = %d' % (campaign_id))
-    # print(start_date,end_date)
     with open("events.json", "r") as input_data:
-        # print(input_data.read())
         return input_data.read()
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
-    return render_template("compareCampaigns.html")
+    import db_helpers
+
+    if request.method == 'POST':
+        to_compare = request.form
+        campaign1 = to_compare['campaign1']
+        campaign2 = to_compare['campaign2']
+        print("campaign 1 is ", campaign1)
+        print("campaign 2 is ", campaign2)
+        query1 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign1))
+        query2 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign2))
+        print("campaign: ", query1)
+        if(datetime.strptime(query1[0][4], "%Y-%m-%d") > now):
+            query1.append("in_progress")
+        else:
+            query1.append("ended")
+        if(datetime.strptime(query2[0][4], "%Y-%m-%d") > now):
+            query2.append("in_progress")
+        else:
+            query2.append("ended")
+        return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
+    return render_template("compareCampaigns.html", c1 = [], c2 = [])
+
 # add any other routes above
 
 #helper methods
@@ -208,10 +254,43 @@ def displayFacebookJSON(page, start, end, stats):
     print(result)
     # making the time look nice
     if 'posts' in result:
-	    try:
-	        dt = dt.replace(year=dt.year-years)
-	    except ValueError:
-	        dt = dt.replace(year=dt.year-years, day=dt.day-1)
+        print("POSTS HERE")
+        for i in result['posts']:
+            if 'post_created_time' in i:
+                temp = re.sub('[a-zA-Z]', ' ', i['post_created_time'])
+                temp = re.sub('\+.*$', '', temp)
+                i['post_created_time'] = temp
+
+    if 'Website' in result:
+        result['Website'] = re.sub('.*//', '', result['Website'])
+    
+    return result
+
+# input: string in the form of "x,y,a" and facebook data as a tuple
+# output: dict of facebook data 
+def filterPosts(searchQuery, facebookData):
+    #make sure query is regex friendly
+    q = re.sub(r'\s*,\s*', '|', searchQuery, flags=re.IGNORECASE)
+
+    #convert the tuple to a dict
+    result = dict(facebookData)
+    relevantPosts = list()
+
+    #filter posts to see which are relevant
+    for post in result['posts']:
+        if(re.search(q, post['post_message'], flags=re.IGNORECASE)):
+            p = dict(post)
+            relevantPosts.append(p)
+    #add our relevant posts
+    result['posts'] = relevantPosts
+    #return dict with information
+    return result
+
+def subtract_years(dt, years):
+    try:
+        dt = dt.replace(year=dt.year-years)
+    except ValueError:
+        dt = dt.replace(year=dt.year-years, day=dt.day-1)
     return dt
 
 def sort_posts(posts):
