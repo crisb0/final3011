@@ -21,6 +21,7 @@
 							<th scope="col">Status</th>
 							<th scope="col">Tags</th>
 							<th scope="col">View</th>
+							<th scope="col">Edit</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -39,6 +40,7 @@
 							</td>
 							<td>{{ i[4] }}</td>
                             <td><a href="/viewCampaign/{{ i[0] }}" class="button campaign-view">View</a></td>
+														<td><a href="/editCampaign/{{ i[0] }}"class="button campaign-view">Edit</a></td>
 						</tr>
                         {% endfor %}
 					</tbody>
