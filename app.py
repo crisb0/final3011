@@ -169,7 +169,12 @@ def viewCampaign(campaign_id):
     import db_helpers
 
     print(campaign_id)
-
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+    #print(campaign)
+    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
+        campaign.append("in_progress")
+    else:
+        campaign.append("ended")
     events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
 
     event_form = EventForm(request.form)
@@ -183,10 +188,10 @@ def viewCampaign(campaign_id):
             event_form['end_date'],
             campaign_id
             ))
-        return render_template('vewCampaign.html', form = event_form, events = events)
+        return render_template('vewCampaign.html', form = event_form, events = events, campaign = campaign)
 
 
-    return render_template("viewCampaign.html", form = event_form, events = events)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
@@ -201,9 +206,17 @@ def compareCampaigns():
         query1 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign1))
         query2 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign2))
         print("campaign: ", query1)
+        if(datetime.strptime(query1[0][4], "%Y-%m-%d") > now):
+            query1.append("in_progress")
+        else:
+            query1.append("ended")
+        if(datetime.strptime(query2[0][4], "%Y-%m-%d") > now):
+            query2.append("in_progress")
+        else:
+            query2.append("ended")
         return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
     return render_template("compareCampaigns.html", c1 = [], c2 = [])
-    
+
 # add any other routes above
 
 #helper methods
