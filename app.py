@@ -8,7 +8,7 @@ from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm 
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
-import sentiment
+#import sentiment
 import re
 
 app = Flask(__name__, static_url_path='/static')
@@ -184,46 +184,50 @@ def all_campaigns(goals):
 @app.route('/viewCampaign', methods=['GET', 'POST'])
 def viewCampaign():
     import db_helpers
+    db = db_helpers.get_db()
     campaign_id = request.args.get('campaign_id')
-    campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
-    print("HELLO")
+    campaigns = db_helpers.query_db('select distinct * from campaigns where id = %d' % (int(campaign_id)))
+    #get events
+    events = return_events(int(campaign_id))
+    #overwrite events.json
+    with open("events.json", "w") as jsonFile:
+        json.dump(events, jsonFile)
+
    # print(campaigns)
     #if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
     #    campaign.append("in_progress")
     #else:
     #    campaign.append("ended")
-    #events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
-    #print("EVENTS....")
-    #print(events)
-    #print("END EVENTS...")
-    #events_list = return_events(campaign_id)
-    #events = json.dumps(events)
-    #events = json.dumps(events_list)
-
     event_form = EventForm(request.form)
 
     if request.method == 'POST':
-        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-            event_form['event_name'],
-            event_form['event_description'],
-            event_form['event_type'],
-            event_form['start_date'],
-            event_form['end_date'],
-            campaign_id
-            ))
+        q = 'insert into events values (null, "%s", "%s", "%s", "%s", "%s", "    %s")' % (
+             getval(event_form['event_name']),
+             getval(event_form['event_description']),
+             getval(event_form['event_type']),
+             getval(event_form['start_date']),
+             getval(event_form['end_date']),
+             campaign_id
+             )
+        print(q)
+        query = db_helpers.query_db(q)
+        db.commit()
+    return render_template("viewCampaign.html", form = event_form, campaign = campaigns)
 
-   # return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
-    return render_template("viewCampaign.html", campaign= campaigns, events=events)
-@app.route('/events')
-def return_events():
-    campaign_id = 1;
+def getval(string):
+    print(string)
+    match = re.search( r'value="(.+)"', str(string))
+    return match.group(1)
+
+def return_events(campaign_id):
     import db_helpers
     events = db_helpers.query_db('select * from events where campaign = %s' % (campaign_id))
     events_list = []
     for event in events:
         event_dict = {"title": event[1], "start": event[4], "end": event[5]}
         events_list.append(event_dict)
-    return json.dumps(events_list)
+    return events_list 
+
 
 @app.route('/data')
 def return_data():
@@ -366,7 +370,7 @@ def create_fb_request(page_name, start_time, end_time):
     return request_string
 
 if __name__ == "__main__":
-    app.run(debug=True):w
+    app.run(debug=True)
 
 #test = get_week_comment("Telstra", "2018-01-01T00:00:00Z", 20)
 #print(test)
