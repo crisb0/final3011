@@ -37,11 +37,11 @@ def login():
         result = request.form
         #print('select * from users where email = %s and password = %s' % (result['email'], result['password']))
         user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
-        
+
         if user is None:
             print('Invalid credentials')
             return redirect('/login')
-        
+
         user = load_user(user[0])
         login_user(user)
         return redirect('/trackCampaigns')
@@ -65,20 +65,21 @@ def register():
     if request.method == 'POST' and registration_form.validate():
         result = request.form
         # check that the company doesn't already exist
-        
+
         # make db entry
-        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
+        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']))
 
         cur.execute(
                  'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook']) 
                  )
         db.commit()
+        #log in user straight away
         user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
         user = load_user(user[0])
         login_user(user)
         return redirect('/trackCampaigns')
-        #return redirect('/login')
-    
+        
+   
     return render_template("reg.html", form=registration_form)
 
 @app.route('/dashboard')
@@ -109,11 +110,11 @@ def trackCampaigns():
     import db_helpers
 
     print(current_user.id)
-    
+
     campaigns = db_helpers.query_db('select id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
 
     print(campaigns)
-     
+
 
     return render_template("trackCampaigns.html", campaigns = campaigns)
 
@@ -130,21 +131,21 @@ def createCampaign():
             create_campaign_form['campaign_name'],
             create_campaign_form['campaign_description'],
             create_campaign_form['tags'],
-            create_campaign_form['start_date'], 
+            create_campaign_form['start_date'],
             create_campaign_form['end_date'],
             create_campaign_form['comment_count'],
             create_campaign_form['sentiment_score'],
             create_campaign_form['like_count']
-            )) 
+            ))
         db.commit()
 
         campaign_id = db_helpers.query_db('select id from campaigns where name = "%s"'%(create_campaign_form['campaign_name']), (), True)
 
         query = db_helpers.query_db('insert into user_campaigns (user_id, campaign_id) values (%s, %s)'%(current_user.id, campaign_id[0]))
         db.commit()
-        
+
         return render_template("createCampaign.html")
-    
+
     return render_template("createCampaign.html")
 
 @app.route('/campaigns', methods=['GET', 'POST'])
@@ -170,12 +171,15 @@ def viewCampaign(campaign_id):
             event_form['start_date'],
             event_form['end_date'],
             campaign_id
-            ))    
+            ))
         return render_template('vewCampaign.html', form = event_form, events = events)
-        
+
 
     return render_template("viewCampaign.html", form = event_form, events = events)
 
+@app.route('/compareCampaigns', methods=['GET', 'POST'])
+def compareCampaigns():
+    return render_template("compareCampaigns.html")
 # add any other routes above
 
 #helper methods
