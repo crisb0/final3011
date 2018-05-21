@@ -3,7 +3,8 @@ create table users(
     id integer primary key autoincrement,
     email string not null,
     companyName string not null,
-    companyUrl string not null,
+    companyWebsite string not null,
+    companyFacebook string not null,
     password string not null
 );
 
