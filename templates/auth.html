@@ -37,7 +37,8 @@
                         {{ form.email }}
                         <label>Password</label>
                         {{ form.password }}
-                        <button><input type=submit value=Login style="border:0;background-color:transparent;"></button>
+						<!--<button type='submit' class="button button__accent">Log in</button>-->
+                        <input type="submit" value="Login" class="button button__accent">						
                         <a href="#"><h6 class="left-align" >Forgot your password?</h6></a>
 						<a href="{{url_for('register')}}"><h6 class="left-align" >Don't have an account? Register here.</h6></a>
 					</form>

@@ -15,13 +15,13 @@
   background-color: transparent;
   border-radius: 30px;
   text-align: center;
-  text-decoration: none; 
+  text-decoration: none;
   }
 
 .campaign-in-progress{
   background-color: #05bd8d;
   border-color: #05bd8d;
-  color: #fff; 
+  color: #fff;
 }
 
 .campaign-complete{
@@ -55,6 +55,19 @@
 
 .side-content {
   padding-left: 10%;
+}
+
+.left-campaign {
+  padding-right: 2%;
+  float: left;
+  width: 50%;
+  border-right: 1px solid #05bd8d;
+}
+
+.right-campaign {
+  padding-left: 5%;
+  float: right;
+  width: 50%;
 }
 
 img.profile{

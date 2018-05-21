@@ -1,75 +1,4 @@
 {% extends "layout.html" %}
-
-{% block head %}
-{{ super() }}
-<link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
-<link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
-<script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
-<script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
-<script>
-
-	$(document).ready(function() {
-
-		$('#calendar').fullCalendar({
-			header: {
-				left: 'prev,next today',
-				center: 'title',
-				right: 'month,agendaDay'
-			},
-			defaultDate: '2018-05-21',
-            themeSystem: 'bootstrap4',
-			editable: true,
-			eventLimit: true, // allow "more" link when too many events
-			events: {
-				url: 'data',
-				error: function() {
-					$('#script-warning').show();
-				}
-			},
-			loading: function(bool) {
-				$('#loading').toggle(bool);
-			}
-		});
-
-	});
-
-</script>
-<style>
-
-	body {
-		margin: 0;
-		padding: 0;
-	}
-
-	#script-warning {
-		display: none;
-		background: #eee;
-		border-bottom: 1px solid #ddd;
-		padding: 0 10px;
-		line-height: 40px;
-		text-align: center;
-		font-weight: bold;
-		font-size: 12px;
-		color: red;
-	}
-
-	#loading {
-		display: none;
-		position: absolute;
-		top: 10px;
-		right: 10px;
-	}
-
-	#calendar {
-		max-width: 750px;
-		margin: 40px auto;
-		/*padding: 0 10px;*/
-	}
-
-</style>
-{% endblock %}
-
 {% block body %}
 <!-- Page content -->
 <div class="app">
@@ -77,9 +6,8 @@
 		<div class="app__inner">
 			<div class="app__main">
 				<div class="text-container">
-                    <div><span class="app__main__title" style="font-size:2.074em;margin:1.414em 0 0.5em;font-weight:400;line-height:1.35;color:#111;">{{ name }}&ensp;</span></div>
-                    <p>{{ descript }}<br>Started {{ start }} | Ended {{ end }}</p>
-                    <button style="line-height:1em;">Edit Campaign</button>&ensp;<button style="line-height:1em;">Add Event</button>
+					<h1 class="app__main__title">Your Campaign</h1>
+                    <button>Edit</button>
 				</div>
 				<table class="table table-striped">
 					<thead>
@@ -100,7 +28,6 @@
 						</tr>
 					</tbody>
 				</table>
-                <div id='calendar' style="float:center;"></div>
 
                 <h3>Goals</h3>
                 <div class="row">
