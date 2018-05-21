@@ -6,7 +6,7 @@ import requests, os
 from operator import itemgetter
 from itertools import islice
 from forms import LoginForm, RegistrationForm, EventForm 
-from flask_login import LoginManager, current_user, login_user, logout_user login_required
+from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
 import re
 
@@ -137,7 +137,7 @@ def trackCampaigns():
    # print(now)
 
     for campaign in campaigns_list:
-        if(datetime.strptime(campaign[3], "%Y-%m-%d") > now):
+        if(datetime.strptime(str(campaign[4]), "%Y-%m-%d") > now):
             campaign.append("in_progress")
         else:
             campaign.append("ended")
@@ -185,26 +185,28 @@ def viewCampaign():
     import db_helpers
     campaign_id = request.args.get('campaign_id')
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
-    #print(campaign)
-    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
-        campaign.append("in_progress")
-    else:
-        campaign.append("ended")
-    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    print("HELLO")
+   # print(campaigns)
+   # if(datetime.strptime(campaigns[0][4], '%Y-%m-%d') > now):
+   #     campaigns[0].append("in_progress")
+   # else:
+   #     campaign.append("ended")
+   # events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
 
-    event_form = EventForm(request.form)
+   # event_form = EventForm(request.form)
 
-    if request.method == 'POST':
-        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-            event_form['event_name'],
-            event_form['event_description'],
-            event_form['event_type'],
-            event_form['start_date'],
-            event_form['end_date'],
-            campaign_id
-            ))
+   # if request.method == 'POST':
+   #     query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
+   #         event_form['event_name'],
+   #         event_form['event_description'],
+   #         event_form['event_type'],
+   #         event_form['start_date'],
+   #         event_form['end_date'],
+   #         campaign_id
+   #         ))
 
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
+   # return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
+    return render_template("viewCampaign.html", campaign= campaigns)
 
 @app.route('/data')
 def return_data():
