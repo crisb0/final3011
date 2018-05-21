@@ -70,7 +70,7 @@ def register():
         #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']))
 
         cur.execute(
-                 'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook']) 
+                 'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook'])
                  )
         db.commit()
         #log in user straight away
@@ -78,8 +78,8 @@ def register():
         user = load_user(user[0])
         login_user(user)
         return redirect('/trackCampaigns')
-        
-   
+
+
     return render_template("reg.html", form=registration_form)
 
 @app.route('/dashboard')
@@ -119,7 +119,7 @@ def trackCampaigns():
         #print(t)
         campaigns_list.append(t)
    # print(now)
-    
+
     for campaign in campaigns_list:
         if(datetime.strptime(campaign[3], "%Y-%m-%d") > now):
             campaign.append("in_progress")
@@ -190,7 +190,20 @@ def viewCampaign(campaign_id):
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
-    return render_template("compareCampaigns.html")
+    import db_helpers
+
+    if request.method == 'POST':
+        to_compare = request.form
+        campaign1 = to_compare['campaign1']
+        campaign2 = to_compare['campaign2']
+        print("campaign 1 is ", campaign1)
+        print("campaign 2 is ", campaign2)
+        query1 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign1))
+        query2 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign2))
+        print("campaign: ", query1)
+        return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
+    return render_template("compareCampaigns.html", c1 = [], c2 = [])
+    
 # add any other routes above
 
 #helper methods
