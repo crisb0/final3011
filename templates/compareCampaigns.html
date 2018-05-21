@@ -5,6 +5,8 @@
 	<div class="container">
 		<div class="app__inner">
 			<div class="app__main">
+				<h2 class="app__main__title">Compare your campaigns</h2>
+				<p>Here you can Enter compare the performance of any two campaigns</p>
 				<div class="compare-campaign-input">
 					<form class="form" action="{{url_for('compareCampaigns')}}", method = "POST">
 						<div class="left-campaign">
@@ -31,16 +33,21 @@
 								<th scope="col">Date Started</th>
 								<th scope="col">Date Ended</th>
 								<th scope="col">Status</th>
-								<th scope="col">% of goals reached</th>
-								<th scope="col">Partner</th>
+								<th scope="col">Tags</th>
 						</thead>
 						<tbody>
 							<tr>
 								<td>{{ c1[0][3] }}</td>
 								<td>{{ c1[0][4] }}</td>
-								<td><span class="campaign campaign-in-progress">In Progress</span></td>
-								<td>12</td>
-								<td>N/A</td>
+								<td>
+									{% if c1[1] == "in_progress" %}
+										<span class="campaign campaign-in-progress">In Progress</span>
+									{% endif %}
+									{% if c1[1] == "ended" %}
+										<span class="campaign campaign-complete">Ended</span>
+									{% endif %}
+								</td>
+								<td> {{ c1[0][5] }}</td>
 							</tr>
 						</tbody>
 					</table>
@@ -102,16 +109,21 @@
 									<th scope="col">Date Started</th>
 									<th scope="col">Date Ended</th>
 									<th scope="col">Status</th>
-									<th scope="col">% of goals reached</th>
-									<th scope="col">Partner</th>
+									<th scope="col">Tags</th>
 							</thead>
 							<tbody>
 								<tr>
 									<td>{{ c2[0][3] }}</td>
 									<td>{{ c2[0][4] }}</td>
-									<td><span class="campaign campaign-in-progress">In Progress</span></td>
-									<td>12</td>
-									<td>N/A</td>
+									<td>
+										{% if c2[1] == "in_progress" %}
+											<span class="campaign campaign-in-progress">In Progress</span>
+										{% endif %}
+										{% if c2[1] == "ended" %}
+											<span class="campaign campaign-complete">Ended</span>
+										{% endif %}
+									</td>
+									<td>{{ c2[0][5] }}</td>
 								</tr>
 							</tbody>
 						</table>

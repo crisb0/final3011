@@ -15,16 +15,21 @@
 							<th scope="col">Date Started</th>
 							<th scope="col">Date Ended</th>
 							<th scope="col">Status</th>
-							<th scope="col">% of goals reached</th>
-							<th scope="col">Partner</th>
+							<th scope="col">Tags</th>
 					</thead>
 					<tbody>
 						<tr>
-							<td>2018-01-03</td>
-							<td>2018-12-01</td>
-							<td><span class="campaign campaign-in-progress">In Progress</span></td>
-							<td>12</td>
-							<td>N/A</td>
+							<td>{{ campaign[0][3] }}</td>
+							<td>{{ campaign[0][4] }}</td>
+							<td>
+								{% if campaign[1] == "in_progress" %}
+									<span class="campaign campaign-in-progress">In Progress</span>
+								{% endif %}
+								{% if campaign[1] == "ended" %}
+									<span class="campaign campaign-complete">Ended</span>
+								{% endif %}
+							</td>
+							<td> {{ campaign[0][5] }}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -60,7 +65,7 @@
                             <strong>Goal</strong>: 2000<br>
                             <strong>Current</strong>: 1481.08
                         </p>
-                        
+
                     </div>
                 </div>
 

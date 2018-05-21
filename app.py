@@ -8,6 +8,8 @@ from forms import LoginForm, RegistrationForm, EventForm
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
 import sentiment
+import re
+
 app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'this_is_a_secret'
 lm = LoginManager(app)
@@ -85,24 +87,36 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
+    import db_helpers
+    from db_helpers import query_db
+    
+    user = load_user(current_user.id)
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    print(user.companyFacebook)
+    print(match)
+    facebookName = match.group(1)
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(user.id))
 
+    
     end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
     stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
-    facebook = displayFacebookJSON(company.get('fbName'), end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    facebook = displayFacebookJSON(facebookName, end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
+    #how you would use filterPosts
+    fb = filterPosts(campaigns[0][4], facebook)
 
     total_likes = 0
-    for post in facebook['posts']:
+    for post in fb['posts']:
         total_likes += post['post_like_count']
 
     facebook_data={}
-    facebook_data['num_posts'] = len(facebook['posts'])
+    facebook_data['num_posts'] = len(fb['posts'])
     facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
     facebook_data['avg_react_per_post'] = round(total_likes/facebook_data['num_posts'], 2)
 
     # should be done by sentiment but whatever
-    post_popularity=islice(sort_posts(facebook['posts']), 10)
+    post_popularity=islice(sort_posts(fb['posts']), 10)
 
-    return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
+    return render_template("dashboard.html", company=company, facebook=fb, facebook_data=facebook_data, post_popularity=post_popularity)
 
 @app.route('/trackCampaigns')
 @login_required
@@ -169,7 +183,12 @@ def viewCampaign(campaign_id):
     import db_helpers
 
     print(campaign_id)
-
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
+    #print(campaign)
+    if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
+        campaign.append("in_progress")
+    else:
+        campaign.append("ended")
     events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
 
     event_form = EventForm(request.form)
@@ -183,10 +202,10 @@ def viewCampaign(campaign_id):
             event_form['end_date'],
             campaign_id
             ))
-        return render_template('vewCampaign.html', form = event_form, events = events)
+        return render_template('vewCampaign.html', form = event_form, events = events, campaign = campaign)
 
 
-    return render_template("viewCampaign.html", form = event_form, events = events)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
@@ -201,9 +220,17 @@ def compareCampaigns():
         query1 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign1))
         query2 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign2))
         print("campaign: ", query1)
+        if(datetime.strptime(query1[0][4], "%Y-%m-%d") > now):
+            query1.append("in_progress")
+        else:
+            query1.append("ended")
+        if(datetime.strptime(query2[0][4], "%Y-%m-%d") > now):
+            query2.append("in_progress")
+        else:
+            query2.append("ended")
         return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
     return render_template("compareCampaigns.html", c1 = [], c2 = [])
-    
+
 # add any other routes above
 
 #helper methods
@@ -228,7 +255,27 @@ def displayFacebookJSON(page, start, end, stats):
 
     if 'Website' in result:
         result['Website'] = re.sub('.*//', '', result['Website'])
+    
+    return result
 
+# input: string in the form of "x,y,a" and facebook data as a tuple
+# output: dict of facebook data 
+def filterPosts(searchQuery, facebookData):
+    #make sure query is regex friendly
+    q = re.sub(r'\s*,\s*', '|', searchQuery, flags=re.IGNORECASE)
+
+    #convert the tuple to a dict
+    result = dict(facebookData)
+    relevantPosts = list()
+
+    #filter posts to see which are relevant
+    for post in result['posts']:
+        if(re.search(q, post['post_message'], flags=re.IGNORECASE)):
+            p = dict(post)
+            relevantPosts.append(p)
+    #add our relevant posts
+    result['posts'] = relevantPosts
+    #return dict with information
     return result
 
 def subtract_years(dt, years):
