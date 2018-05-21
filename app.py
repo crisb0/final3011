@@ -174,21 +174,26 @@ def createCampaign():
     return render_template("createCampaign.html")
 
 @app.route('/campaigns', methods=['GET', 'POST'])
+@login_required
 def all_campaigns(goals):
     print(goals)
     return render_template("createCampaign.html", goals=goals)
 
 @app.route('/viewCampaign/<campaign_id>', methods=['GET', 'POST'])
+@login_required
 def viewCampaign(campaign_id):
     import db_helpers
 
-    print(campaign_id)
+    user = load_user(current_user.id)
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    facebookName = match.group(1)
     campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id))
     #print(campaign)
     if(datetime.strptime(campaign[0][4], "%Y-%m-%d") > now):
         campaign.append("in_progress")
     else:
         campaign.append("ended")
+    sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
     events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
 
     event_form = EventForm(request.form)
@@ -202,12 +207,13 @@ def viewCampaign(campaign_id):
             event_form['end_date'],
             campaign_id
             ))
-        return render_template('vewCampaign.html', form = event_form, events = events, campaign = campaign)
+        return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, sentiments=sentiments)
 
 
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign, sentiments=sentiments)
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
+@login_required
 def compareCampaigns():
     import db_helpers
 
@@ -317,13 +323,13 @@ def sort_posts(posts):
     result = sorted(posts, key=itemgetter('post_like_count'), reverse=True)
     return result
 
-def get_week_comment(page, start, week):
-    startdate = datetime.strptime(start, "%Y-%m-%dT%H:%M:%SZ")
+def get_week_comment(page, end , week):
+    enddate = datetime.strptime(end , "%Y-%m-%dT%H:%M:%SZ")
     d = timedelta(weeks=week)
-    enddate = startdate + d
+    startdate = enddate - d
     rq_string = create_fb_request(page,startdate, enddate)
     page_stats = requests.get(rq_string).json() 
-    text = "" 
+    text = "neutral" 
     if "data" in page_stats:
         for x in page_stats["data"]:
             if "comments" in x:
@@ -337,10 +343,36 @@ def create_fb_request(page_name, start_time, end_time):
     access_token = os.environ.get('FB_API_KEY')
     request_string = "https://graph.facebook.com/v2.12/%s/posts?fields=comments.since(%s).until(%s)&access_token=%s" % (page_name,start_time.timestamp(),end_time.timestamp(),access_token)
     return request_string
+def get_all_weeks(page_name,frm,to):
+    fromTime = datetime.strptime(frm , "%Y-%m-%d")
+    toTime = min(datetime.strptime(to , "%Y-%m-%d"),now)
+    d = timedelta(weeks=1)
+    scores = []
+    while fromTime <= toTime:
+        scores.append(get_score_for_week(page_name,datetime.strftime(fromTime, "%Y-%m-%dT%H:%M:%SZ")))
+        fromTime += d
+    return scores
+
+    
+def get_score_for_week(page_name,time):
+    from db_helpers import query_db, get_db
+    query1 = query_db('select score from sentiments where company_name = "%s" and start_date="%s"'%(page_name,time), one=True)
+    if query1 is None: 
+      comments = get_week_comment(page_name,time, 5)
+      score = sentiment.get_sentiment(comments)
+      db = get_db()
+      cur = db.cursor()
+      cur.execute('insert into sentiments (company_name, start_date, score) values ("%s", "%s", %f)' % (page_name,time,score))
+      db.commit()
+      return score
+    else:
+      return query1[0]
+#print(test)
+
 
 if __name__ == "__main__":
-    app.run(debug=True):w
+    app.run(debug=True)
 
-#test = get_week_comment("Telstra", "2018-01-01T00:00:00Z", 20)
+#test = get_score_for_week("Telstra", "2018-01-01T00:00:00Z")
 #print(test)
 #print(sentiment.get_sentiment(test))
