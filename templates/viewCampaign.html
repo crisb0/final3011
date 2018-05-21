@@ -1,39 +1,42 @@
 {% extends "layout.html" %}
 {% block head %}
     {{ super() }}
-    <link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
+    <meta charset='utf-8' />
+<link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
 <link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
 <script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
 <script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
 <script>
+
     $(document).ready(function() {
+
         $('#calendar').fullCalendar({
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'month,agendaDay'
+                right: 'month,agendaWeek,agendaDay'
             },
             defaultDate: '2014-09-12',
             editable: true,
             eventLimit: true, // allow "more" link when too many events
             events: {
-                url: 'data',
-                error: function() {
-                    $('#script-warning').show();
-                }
-            },
-            loading: function(bool) {
-                $('#loading').toggle(bool);
+                url: 'data'
             }
         });
+
     });
+
 </script>
 <style>
+
     body {
         margin: 0;
         padding: 0;
+        font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+        font-size: 14px;
     }
+
     #script-warning {
         display: none;
         background: #eee;
@@ -45,19 +48,23 @@
         font-size: 12px;
         color: red;
     }
+
     #loading {
         display: none;
         position: absolute;
         top: 10px;
         right: 10px;
     }
+
     #calendar {
-        max-width: 750px;
+        max-width: 900px;
         margin: 40px auto;
-        /*padding: 0 10px;*/
+        padding: 0 10px;
     }
+
 </style>
 {% endblock %}
+
 {% block body %}
 <!-- Page content -->
 <div class="app">

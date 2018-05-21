@@ -1,5 +1,6 @@
 #!flask/bin/python3
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+import json
 from datetime import datetime, date
 import requests, os
 from operator import itemgetter
@@ -75,6 +76,7 @@ def register():
     return render_template("reg.html", form=registration_form)
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     from db_helpers import query_db
 
@@ -148,16 +150,13 @@ def all_campaigns(goals):
     print(goals)
     return render_template("createCampaign.html", goals=goals)
 
-@app.route('/viewCampaign/<campaign_id>', methods=['GET', 'POST'])
-def viewCampaign(campaign_id):
+@app.route('/viewCampaign', methods=['GET', 'POST'])
+def viewCampaign():
     import db_helpers
-
+    campaign_id = request.args.get('campaign_id')
     print(campaign_id)
-    print("IJHBGYTGUGHHSEDRCFVTGBYTFVRDFVTGBYHNBGHJNMNHBGYTF")
-    #events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    print("!!!!")
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
-    print("hello")
-    print(campaigns)
 
     #event_form = EventForm(request.form)
 
@@ -175,6 +174,10 @@ def viewCampaign(campaign_id):
 
     #return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
     return render_template("viewCampaign.html", campaigns=campaigns)
+
+@app.route('/test')
+def calendar():
+    return render_template("json.html")
 
 @app.route('/data')
 def return_data():

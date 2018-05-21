@@ -32,7 +32,8 @@
 							<td><span class="campaign campaign-in-progress">In Progress</span></td>
 							<td>12</td>
 							<td>N/A</td>
-                            <td><a href="/viewCampaign/{{ i[2] }}" class="button campaign-view">View</a></td>
+                            <!-- <td><a href="/viewCampaign/{{ i[2] }}" class="button campaign-view">View</a></td> -->
+                            <td><a href="{{url_for('viewCampaign', campaign_id=i[2])}}" class="button campaign-view">View</a></td>
 						</tr>
                         {% endfor %}
 					</tbody>
