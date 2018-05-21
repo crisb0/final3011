@@ -213,7 +213,8 @@ def viewCampaign():
              )
         query = db_helpers.query_db(q)
         db.commit()
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign, sentiments=sentiments)
+    #return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns, sentiments=sentiments)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns)
 
 def getval(string):
     print(string)
