@@ -37,3 +37,10 @@ create table events(
     end_date sting not null,
     campaign integer references campaign(id)
 );
+
+drop table if exists sentiments;
+create table sentiments(
+    company_name string not null,
+    start_date string not null,
+    score real not null
+);
