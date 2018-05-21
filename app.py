@@ -158,10 +158,25 @@ def viewCampaign(campaign_id):
     import db_helpers
 
     print(campaign_id)
-
+    campaign = db_helpers.query_db('select * from campaigns where id = %s'%(campaign_id), (), True)
     events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
-
+    print(campaign)
     event_form = EventForm(request.form)
+
+    print("http://api2.lionnews.net/news?start_date=%s&end_date=%s&company=%s"%(
+        campaign[4],
+        campaign[5],
+        current_user.companyName
+    ))
+
+    news = requests.get("http://api2.lionnews.net/news?start_date=%s&end_date=%s&company=%s"%(
+        campaign[4],
+        campaign[5],
+        current_user.companyName
+        )).json()
+    
+    headlines = [i['Headline'] for i in news['response']['results']]
+    print(headlines)
 
     if request.method == 'POST':
         query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
