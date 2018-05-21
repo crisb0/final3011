@@ -153,9 +153,11 @@ def viewCampaign(campaign_id):
     import db_helpers
 
     print(campaign_id)
-
+    print("IJHBGYTGUGHHSEDRCFVTGBYTFVRDFVTGBYHNBGHJNMNHBGYTF")
     #events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
     campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
+    print("hello")
+    print(campaigns)
 
     #event_form = EventForm(request.form)
 
@@ -173,6 +175,14 @@ def viewCampaign(campaign_id):
 
     #return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
     return render_template("viewCampaign.html", campaigns=campaigns)
+
+@app.route('/data')
+def return_data():
+    start_date = request.args.get('start', '')
+    end_date = request.args.get('end', '')
+
+    with open("events.json", "r") as input_data:
+        return input_data.read()
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
