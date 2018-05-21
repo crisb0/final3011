@@ -10,7 +10,7 @@
 					<p>Thank you for using our application, we look forward to helping you make the most you can out of your social media!</p>
 					<h2 class="app__main__title">Track your campaigns</h2>
 					<p>Here you can track your campaigns, current or old!</p>
-                    <button style="line-height:1em;"><a href="{{ url_for('createCampaign') }}">Add campaign</a></button>
+                    <button class="button"><a href="{{ url_for('createCampaign') }}">Add campaign</a></button>
                 </div>
 				<table class="table table-striped">
 					<thead>
@@ -21,7 +21,6 @@
 							<th scope="col">Status</th>
 							<th scope="col">Tags</th>
 							<th scope="col">View</th>
-							<th scope="col">Edit</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -41,7 +40,6 @@
 							<td>{{ i[4] }}</td>
                             <!--<td><a href="/viewCampaign/{{ i[0] }}" class="button campaign-view">View</a></td>-->
                             <td><a href="{{url_for('viewCampaign', campaign_id=i[0])}}" class="button campaign-view">View</a></td>
-
 						</tr>
                         {% endfor %}
 					</tbody>
