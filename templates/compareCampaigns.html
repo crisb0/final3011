@@ -5,9 +5,24 @@
 	<div class="container">
 		<div class="app__inner">
 			<div class="app__main">
+				<div class="compare-campaign-input">
+					<form class="form" action="{{url_for('compareCampaigns')}}", method = "POST">
+						<div class="left-campaign">
+							Enter a campaign's name
+							<input type="text" name='campaign1'>
+						</div>
+						<div class="right-campaign">
+						Enter the campaign you wish to compare it to
+						<input type="text" name='campaign2'>
+						</div>
+						<button type="submit" value="Submit" class="button button__accent">Compare</button>
+					</form>
+				</div>
 				<div class="left-campaign">
 					<div class="text-container">
-						<h1 class="app__main__title">Your Campaign</h1>
+						{% if c1 %}
+						<h1 class="app__main__title">{{ c1[0][1] }}</h1>
+
 	                    <button>Edit</button>
 					</div>
 					<table class="table table-striped">
@@ -21,8 +36,8 @@
 						</thead>
 						<tbody>
 							<tr>
-								<td>2018-01-03</td>
-								<td>2018-12-01</td>
+								<td>{{ c1[0][4] }}</td>
+								<td>{{ c1[0][5] }}</td>
 								<td><span class="campaign campaign-in-progress">In Progress</span></td>
 								<td>12</td>
 								<td>N/A</td>
@@ -71,12 +86,14 @@
 									</div>
 								</div>
 							</div>
-
+						{% endif %}
 					</div>
 
 					<div class="right-campaign">
 						<div class="text-container">
-							<h1 class="app__main__title">Your Campaign</h1>
+							{% if c2 %}
+							<h1 class="app__main__title">{{ c2[0][1] }}</h1>
+
 		                    <button>Edit</button>
 						</div>
 						<table class="table table-striped">
@@ -90,8 +107,8 @@
 							</thead>
 							<tbody>
 								<tr>
-									<td>2018-01-03</td>
-									<td>2018-12-01</td>
+									<td>{{ c2[0][4] }}</td>
+									<td>{{ c2[0][4] }}</td>
 									<td><span class="campaign campaign-in-progress">In Progress</span></td>
 									<td>12</td>
 									<td>N/A</td>
@@ -140,7 +157,7 @@
 										</div>
 									</div>
 								</div>
-
+							{% endif %}
 					</div>
         </div>
     	</div>
