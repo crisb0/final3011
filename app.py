@@ -151,7 +151,7 @@ def createCampaign():
     create_campaign_form = request.form
 
     if request.method == 'POST':
-        query = db_helpers.query_db('insert into campaigns (name, description, tags, start_date, end_date, comments_target, comments_sentiment_score, likes_target) values ("%s", "%s", "%s", "%s", "%s", %s, %s, %s)'%(
+        query = db_helpers.query_db('insert into campaigns (name, description, tags, start_date, end_date, comments_target, sentiment_score, likes_target) values ("%s", "%s", "%s", "%s", "%s", %s, %s, %s)'%(
             create_campaign_form['campaign_name'],
             create_campaign_form['campaign_description'],
             create_campaign_form['tags'],
