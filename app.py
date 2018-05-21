@@ -78,11 +78,16 @@ def register():
 def dashboard():
     from db_helpers import query_db
 
+    #campaigns = query_db('select distinct id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
+    campaigns = query_db('select distinct * from user_campaigns join campaigns on user_campaigns.campaign_id=campaigns.id where user_id = %s'%(current_user.id))
+    print(campaigns)
+    return render_template("trackCampaigns.html", campaigns = campaigns)
     #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) and user_campaigns.user_id = %d' % userid, (), True)
-    camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id)', (), False); 
-    for x in camps:
-        print(x)
-    return render_template("trackCampaigns.html", camps=camps)
+    #camps = query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id)', (), False); 
+    #for x in camps:
+    #    print("!!!")
+    #    print(x)
+    #return render_template("trackCampaigns.html", camps=camps)
 
     #end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
     #stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
@@ -96,20 +101,16 @@ def dashboard():
     #facebook_data['num_posts'] = len(facebook['posts'])
     #facebook_data['daily_posts'] = round(facebook_data['num_posts']/365, 2)
 
-    return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
+    #return render_template("dashboard.html", company=company, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity)
 
 @app.route('/trackCampaigns')
 @login_required
 def trackCampaigns():
     import db_helpers
 
-    print(current_user.id)
-
-    campaigns = db_helpers.query_db('select id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
-
+    campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(current_user.id))
+    print("!!!")
     print(campaigns)
-
-
     return render_template("trackCampaigns.html", campaigns = campaigns)
 
 @app.route('/createCampaign', methods=['GET', 'POST'])
@@ -153,24 +154,25 @@ def viewCampaign(campaign_id):
 
     print(campaign_id)
 
-    events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
-    campaigns = db_helpers.query_db('select * from campaigns where id = %s' % (campaign_id))
+    #events = db_helpers.query_db('select * from events where campaign = %s'%(campaign_id))
+    campaigns = db_helpers.query_db('select distinct * from campaigns where id = %s' % (campaign_id))
 
-    event_form = EventForm(request.form)
+    #event_form = EventForm(request.form)
 
-    if request.method == 'POST':
-        query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
-            event_form['event_name'],
-            event_form['event_description'],
-            event_form['event_type'],
-            event_form['start_date'],
-            event_form['end_date'],
-            campaign_id
-            ))
-        return render_template('vewCampaign.html', form = event_form, events = events, campaigns=campaigns)
+    #if request.method == 'POST':
+    #    query = db_helpers.query_db('insert into events (event_name, event_description, event_type, start_date, end_date, campaign) values ("%s", "%s", "%s", "%s", "%s", "%s")'%(
+    #        event_form['event_name'],
+    #        event_form['event_description'],
+    #        event_form['event_type'],
+    #        event_form['start_date'],
+    #        event_form['end_date'],
+    #        campaign_id
+    #        ))
+        #return render_template('vewCampaign.html', form = event_form, events = events, campaigns=campaigns)
 
 
-    return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
+    #return render_template("viewCampaign.html", form = event_form, events = events, campaigns=campaigns)
+    return render_template("viewCampaign.html", campaigns=campaigns)
 
 @app.route('/compareCampaigns', methods=['GET', 'POST'])
 def compareCampaigns():
