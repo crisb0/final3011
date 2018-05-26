@@ -204,7 +204,7 @@ def viewCampaign():
         campaign.append("in_progress")
     else:
         campaign.append("ended")
-    sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
+    #sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
 	
     ###
 
@@ -248,7 +248,7 @@ def viewCampaign():
 
         return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, sentiments=sentiments, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity, content=content)
 
-        #return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaigns)
+    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
 
 def getval(string):
     print(string)
@@ -418,19 +418,19 @@ def get_all_weeks(page_name,frm,to):
     return scores
 
     
-def get_score_for_week(page_name,time):
-    from db_helpers import query_db, get_db
-    query1 = query_db('select score from sentiments where company_name = "%s" and start_date="%s"'%(page_name,time), one=True)
-    if query1 is None: 
-      comments = get_week_comment(page_name,time, 5)
-      score = sentiment.get_sentiment(comments)
-      db = get_db()
-      cur = db.cursor()
-      cur.execute('insert into sentiments (company_name, start_date, score) values ("%s", "%s", %f)' % (page_name,time,score))
-      db.commit()
-      return score
-    else:
-      return query1[0]
+#def get_score_for_week(page_name,time):
+#    from db_helpers import query_db, get_db
+#    query1 = query_db('select score from sentiments where company_name = "%s" and start_date="%s"'%(page_name,time), one=True)
+#    if query1 is None: 
+#      comments = get_week_comment(page_name,time, 5)
+#      score = sentiment.get_sentiment(comments)
+#      db = get_db()
+#      cur = db.cursor()
+#      cur.execute('insert into sentiments (company_name, start_date, score) values ("%s", "%s", %f)' % (page_name,time,score))
+#      db.commit()
+#      return score
+#    else:
+#      return query1[0]
 #print(test)
 
 
