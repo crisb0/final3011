@@ -102,41 +102,6 @@
 				</table>
                 <hr>
 
-            <div style='display:flex; justify-content:space-between;margin-top:30px;'>
-                <!--<div id='calendar' style="float:left; margin:0px; padding-top:10px; height:100%;"></div>-->
-                <div id='calendar'></div>
-
-                <div id='event-form' style="width:45%; padding-left:30px;">
-                <form class="form" action="{{url_for('viewCampaign', campaign_id=campaign[0][0])}}", method = "POST">
-
-                    Event Name
-                    <input type="text" name='event_name' style="margin:0.8em;" placeholder="Add a name for your event">
-                    Event Description 
-                    <input type="text" name="event_description"style="margin:0.8em;" placeholder="Add a description for your event">
-                    Event Type 
-                    <input type="text" name="event_type"style="margin:0.8em;" placeholder="e.g. Conference, Post Schedule, Feature Release">
-
-                    <div class="form-group">
-                        Start Date
-                        <div class="cols-sm-10">
-                            <div class="input-group col-sm-10">
-                                <input class="form-control rounded" style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="start_date" style="max-width:40%"/>
-                            </div> <!--close input group -->
-                        </div> <!--close col-->
-                    </div>
-
-                    <div class="form-group">
-                        End Date
-                        <div class="cols-sm-10">
-                            <div class="input-group col-sm-10">
-                                <input class="form-control rounded"style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="end_date" />
-                            </div> <!--close input group -->
-                        </div> <!--close col-->
-                    </div>
-                    <button type="submit" value="Submit" class="button button__accent">Add New Event</button>
-
-                </form></div>
-            </div>
 
                 <h3>Goals</h3>
                 <div class="row">
