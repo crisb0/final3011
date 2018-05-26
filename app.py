@@ -249,7 +249,35 @@ def viewCampaign():
 
     return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity, content=content)
 
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
+@app.route('/scheduleCampaign', methods=['GET', 'POST'])
+def scheduleCampaign():
+    import db_helpers
+    db = db_helpers.get_db()
+    campaign_id = request.args.get('campaign_id')
+
+    print("---", campaign_id)
+    events = return_events(campaign_id)
+    print("!!!",events)
+    #overwrite events.json
+    with open("events.json", "w") as jsonFile:
+        json.dump(events, jsonFile)
+
+    event_form = EventForm(request.form)
+
+    if request.method == 'POST':
+        q = 'insert into events values (null, "%s", "%s", "%s", "%s", "%s", "    %s")' % (
+             getval(event_form['event_name']),
+             getval(event_form['event_description']),
+             getval(event_form['event_type']),
+             getval(event_form['start_date']),
+             getval(event_form['end_date']),
+             campaign_id
+             )
+        query = db_helpers.query_db(q)
+        db.commit()
+        return render_template('scheduleCampaign.html', form=event_form, events=events, campaign_id=campaign_id)
+
+    return render_template('scheduleCampaign.html', form=event_form, events=events, campaign_id=campaign_id)
 
 def getval(string):
     print(string)

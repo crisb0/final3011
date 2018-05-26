@@ -74,6 +74,7 @@
 				<div class="text-container">
 					<h1 class="app__main__title">{{ campaign[0][1] }} Campaign</h1>
                     <a href="/editCampaign/{{ campaign[0][0] }}" class="button" style="line-height:1em;">Edit</a>
+                    <a href="{{ url_for('scheduleCampaign', campaign_id=campaign[0][0]) }}" class="button" style="line-height:1em;">Schedule Events</a>
 				</div>
 				<table class="table table-striped">
 					<thead>
