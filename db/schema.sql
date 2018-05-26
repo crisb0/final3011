@@ -17,7 +17,7 @@ create table campaigns(
     end_date string not null,
     tags string not null,
     comments_target integer not null,
-    comments_sentiment_score float not null,
+    sentiment_score float not null,
     likes_target integer not null
 );
 
