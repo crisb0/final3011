@@ -191,6 +191,7 @@ def viewCampaign():
 
     # get events
     events = return_events(int(campaign_id))
+    print("!!!",events)
     #overwrite events.json
     with open("events.json", "w") as jsonFile:
         json.dump(events, jsonFile)
@@ -246,9 +247,37 @@ def viewCampaign():
         query = db_helpers.query_db(q)
         db.commit()
 
-        return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, sentiments=sentiments, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity, content=content)
+    return render_template('viewCampaign.html', form = event_form, events = events, campaign = campaign, facebook=facebook, facebook_data=facebook_data, post_popularity=post_popularity, content=content)
 
-    return render_template("viewCampaign.html", form = event_form, events = events, campaign = campaign)
+@app.route('/scheduleCampaign', methods=['GET', 'POST'])
+def scheduleCampaign():
+    import db_helpers
+    db = db_helpers.get_db()
+    campaign_id = request.args.get('campaign_id')
+
+    print("---", campaign_id)
+    events = return_events(campaign_id)
+    print("!!!",events)
+    #overwrite events.json
+    with open("events.json", "w") as jsonFile:
+        json.dump(events, jsonFile)
+
+    event_form = EventForm(request.form)
+
+    if request.method == 'POST':
+        q = 'insert into events values (null, "%s", "%s", "%s", "%s", "%s", "    %s")' % (
+             getval(event_form['event_name']),
+             getval(event_form['event_description']),
+             getval(event_form['event_type']),
+             getval(event_form['start_date']),
+             getval(event_form['end_date']),
+             campaign_id
+             )
+        query = db_helpers.query_db(q)
+        db.commit()
+        return render_template('scheduleCampaign.html', form=event_form, events=events, campaign_id=campaign_id)
+
+    return render_template('scheduleCampaign.html', form=event_form, events=events, campaign_id=campaign_id)
 
 def getval(string):
     print(string)
@@ -269,8 +298,6 @@ def return_events(campaign_id):
 def return_data():
     start_date = request.args.get('start', '')
     end_date = request.args.get('end', '')
-    campaign_id = request.args.get('campaign_id')
-    print(campaign_id)
     with open("events.json", "r") as input_data:
         return input_data.read()
 
@@ -278,16 +305,16 @@ def return_data():
 @login_required
 def compareCampaigns():
     import db_helpers
+    
+    user = load_user(current_user.id)
+    campaigns = db_helpers.query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) where user_campaigns.user_id = %d' % (user.id))
 
     if request.method == 'POST':
         to_compare = request.form
-        campaign1 = to_compare['campaign1']
-        campaign2 = to_compare['campaign2']
-        print("campaign 1 is ", campaign1)
-        print("campaign 2 is ", campaign2)
-        query1 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign1))
-        query2 = db_helpers.query_db('select * from campaigns where name = "%s"'%(campaign2))
-        print("campaign: ", query1)
+        campaign1 = to_compare['camp1']
+        campaign2 = to_compare['camp2']
+        query1 = db_helpers.query_db('select * from campaigns where id = %d'%(int(campaign1)))
+        query2 = db_helpers.query_db('select * from campaigns where id = %d'%(int(campaign2)))
         if(datetime.strptime(query1[0][4], "%Y-%m-%d") > now):
             query1.append("in_progress")
         else:
@@ -296,8 +323,8 @@ def compareCampaigns():
             query2.append("in_progress")
         else:
             query2.append("ended")
-        return render_template("compareCampaigns.html", c1 = query1, c2 = query2)
-    return render_template("compareCampaigns.html", c1 = [], c2 = [])
+        return render_template("compareCampaigns.html", c1 = query1, c2 = query2,campaigns=campaigns)
+    return render_template("compareCampaigns.html", c1 = [], c2 = [], campaigns=campaigns)
 
 @app.route('/editCampaign/<campaign_id>', methods=['GET', 'POST'])
 def editCampaign(campaign_id):

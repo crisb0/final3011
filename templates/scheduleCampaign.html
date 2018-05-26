@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+{% block head %}
+    {{ super() }}
+<meta charset='utf-8' />
+<link href="{{ url_for('static', filename='fullcalendar.min.css') }}" rel='stylesheet' />
+<link href="{{ url_for('static', filename='fullcalendar.print.css') }}" rel='stylesheet' media='print' />
+<script src="{{ url_for('static', filename='lib/moment.min.js') }}"></script>
+<script src="{{ url_for('static', filename='lib/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='fullcalendar.min.js') }}"></script>
+<script>
+
+	$(document).ready(function() {
+
+		$('#calendar').fullCalendar({
+			header: {
+				left: 'prev,next today',
+				center: 'title',
+				right: 'month,agendaWeek,agendaDay'
+			},
+			defaultDate: '2018-05-22',
+			editable: true,
+			eventLimit: true, // allow "more" link when too many events
+			events: {
+				url: 'data',
+				error: function() {
+					$('#script-warning').show();
+				}
+			},
+			loading: function(bool) {
+				$('#loading').toggle(bool);
+			}
+		});
+
+	});
+
+</script>
+<style>
+
+	body {
+		margin: 0;
+		padding: 0;
+		font-size: 14px;
+	}
+
+	#script-warning {
+		display: none;
+		background: #eee;
+		border-bottom: 1px solid #ddd;
+		padding: 0 10px;
+		line-height: 40px;
+		text-align: center;
+		font-weight: bold;
+		font-size: 12px;
+		color: red;
+	}
+
+	#loading {
+		display: none;
+		position: absolute;
+		top: 10px;
+		right: 10px;
+	}
+
+	#calendar {
+		max-width: 900px;
+		margin: 40px auto;
+		padding: 0 10px;
+	}
+
+</style>
+{% endblock %}
+
+{% block body %}
+	<br />
+	<h1 class="app__main__title" style="text-align:center;">Here's your campaign schedule</h1>
+	<div style="text-align:center;">On this page, see an overview of your campaign events, organise and plan promotional activity and more!</div>
+	<div id='calendar'></div>
+	<h2 style="text-align:center;">Add an Event</h2>
+	<div id='event-form' style="max-width:850px; margin:auto;">
+        <form class="form" action="{{url_for('scheduleCampaign', campaign_id=campaign_id)}}", method = "POST">
+
+            Event Name
+            <input type="text" name='event_name' style="margin:0.8em;" placeholder="Add a name for your event">
+            Event Description 
+            <input type="text" name="event_description"style="margin:0.8em;" placeholder="Add a description for your event">
+            Event Type 
+            <input type="text" name="event_type"style="margin:0.8em;" placeholder="e.g. Conference, Post Schedule, Feature Release">
+
+            <div class="form-group">
+                Start Date
+                <div class="cols-sm-10">
+                    <div class="input-group col-sm-10">
+                        <input class="form-control rounded" style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="start_date" style="max-width:40%"/>
+                    </div> <!--close input group -->
+                </div> <!--close col-->
+            </div>
+
+            <div class="form-group">
+                End Date
+                <div class="cols-sm-10">
+                    <div class="input-group col-sm-10">
+                        <input class="form-control rounded"style="margin:15px;margin:0.5em;" type="date" value="2018-05-22" name="end_date" />
+                    </div> <!--close input group -->
+                </div> <!--close col-->
+            </div>
+            <button type="submit" value="Submit" class="button button__accent">Add New Event</button>
+
+        </form>
+{% endblock %}

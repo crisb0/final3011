@@ -10,12 +10,22 @@
 				<div class="compare-campaign-input">
 					<form class="form" action="{{url_for('compareCampaigns')}}", method = "POST">
 						<div class="left-campaign">
-							Enter a campaign's name
-							<input type="text" name='campaign1'>
+							Select a campaign
+                            <select class="form-control" name="camp1">
+                                <option value="" default selected>Click to choose a campaign</option>
+                                {% for x in campaigns %}
+                                    <option value="{{ x[0] }}">{{ x[1] }}</option>
+                                {% endfor %}
+                            </select>
 						</div>
 						<div class="right-campaign">
-						Enter the campaign you wish to compare it to
-						<input type="text" name='campaign2'>
+						Select the campaign you wish to compare it to
+                        <select class="form-control" name="camp2">
+                        <option value="" default selected>Click to choose a campaign</option>
+                            {% for x in campaigns%}
+                                <option value="{{ x[0] }}">{{ x[1] }}</option>
+                            {% endfor %}
+                        </select>
 						</div>
 						<button type="submit" value="Submit" class="button button__accent">Compare</button>
 					</form>
