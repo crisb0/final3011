@@ -5,7 +5,7 @@ from datetime import datetime, date, timedelta
 import requests, os
 from operator import itemgetter
 from itertools import islice
-from forms import LoginForm, RegistrationForm, EventForm 
+from forms import LoginForm, RegistrationForm, EventForm
 from flask_login import LoginManager, current_user, login_user, logout_user, login_required
 from user import User
 #import sentiment
@@ -40,12 +40,12 @@ def login():
         result = request.form
         #print('select * from users where email = %s and password = %s' % (result['email'], result['password']))
         user = query_db('select * from users where email = "%s" and password = "%s"' % (result['email'], result['password']), (), True)
-        
+
         if user is None:
             print('Invalid credentials')
             return redirect('/login')
 
-        userid = user[0] 
+        userid = user[0]
         user = load_user(user[0])
 
 
@@ -54,10 +54,10 @@ def login():
 
     return render_template("auth.html", form=login_form)
 
-@app.route('/logout')  
-def logout():  
-    logout_user()  
-    return redirect(url_for('index'))  
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -71,9 +71,9 @@ def register():
     if request.method == 'POST' and registration_form.validate():
         result = request.form
         # check that the company doesn't already exist
-        
+
         # make db entry
-        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url'])) 
+        #print('insert into users (email, password, companyName, companyUrl) values ("%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_url']))
 
         cur.execute(
                  'insert into users (email, password, companyName, companyWebsite, companyFacebook) values ("%s", "%s", "%s", "%s", "%s")'%(result['email'], result['password'], result['company_name'], result['company_website'], result['company_facebook'])
@@ -92,7 +92,7 @@ def register():
 def dashboard():
     import db_helpers
     from db_helpers import query_db
-    
+
     user = load_user(current_user.id)
     match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
     print(user.companyFacebook)
@@ -100,7 +100,7 @@ def dashboard():
     facebookName = match.group(1)
     campaigns = db_helpers.query_db('select distinct id, name, start_date, end_date, tags from user_campaigns join campaigns on user_campaigns.campaign_id = campaigns.id where user_id = %s'%(user.id))
 
-    
+
     end_date = (subtract_years(now, 1)).strftime("%Y-%m-%d")
     stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
     facebook = displayFacebookJSON(facebookName, end_date+'T00:00:00Z', now_date+'T00:00:00Z', stats)['FacebookStatisticData']
@@ -206,7 +206,7 @@ def viewCampaign():
     else:
         campaign.append("ended")
     #sentiments = get_all_weeks(facebookName,campaign[0][3],campaign[0][4])
-	
+
     ###
 
     end_date = campaign[0][4]
@@ -220,7 +220,7 @@ def viewCampaign():
     total_likes = 0
     for post in fb['posts']:
         total_likes += post['post_like_count']
-    
+
     campaign_length = datetime.strptime(campaign[0][3], "%Y-%m-%d") - datetime.strptime(campaign[0][4], "%Y-%m-%d")
     c_len = campaign_length.days
     facebook_data={}
@@ -291,7 +291,7 @@ def return_events(campaign_id):
     for event in events:
         event_dict = {"title": event[1], "start": event[4], "end": event[5]}
         events_list.append(event_dict)
-    return events_list 
+    return events_list
 
 
 @app.route('/data')
@@ -305,9 +305,13 @@ def return_data():
 @login_required
 def compareCampaigns():
     import db_helpers
-    
+
     user = load_user(current_user.id)
     campaigns = db_helpers.query_db('select * from campaigns join user_campaigns on (campaigns.id = user_campaigns.campaign_id) where user_campaigns.user_id = %d' % (user.id))
+
+    match = re.search(r"facebook\.com/(\w+).*", user.companyFacebook)
+    facebookName = match.group(1)
+
 
     if request.method == 'POST':
         to_compare = request.form
@@ -323,7 +327,52 @@ def compareCampaigns():
             query2.append("in_progress")
         else:
             query2.append("ended")
-        return render_template("compareCampaigns.html", c1 = query1, c2 = query2,campaigns=campaigns)
+
+        c1_end = query1[0][4]
+        c1_start = query1[0][3]
+        stats = "id,name,website,description,category,fan_count,post_like_count,post_comment_count,post_type,post_message"
+
+        facebook1 = displayFacebookJSON(facebookName, c1_start+'T00:00:00Z', c1_end+'T00:00:00Z', stats)['FacebookStatisticData']
+
+        # facebook stats for campaign 1
+        fb1 = filterPosts(query1[0][5], facebook1)
+
+        total_likes1 = 0
+        for post in fb1['posts']:
+            total_likes1 += post['post_like_count']
+
+        campaign1_length = datetime.strptime(query1[0][3], "%Y-%m-%d") - datetime.strptime(query1[0][4], "%Y-%m-%d")
+        c_len1 = campaign1_length.days
+        facebook_data1={}
+        facebook_data1['num_posts'] = len(fb1['posts'])
+        print("num posts for campaign 1: ", facebook_data1['num_posts'])
+        facebook_data1['daily_posts'] = round(facebook_data1['num_posts']/c_len1, 2)
+        print("posts made per day for campaign 1: ", facebook_data1['daily_posts'])
+        facebook_data1['avg_react_per_post'] = round(total_likes1/facebook_data1['num_posts'], 2)
+        print("avg reacts per post for campaign 1: ", facebook_data1['avg_react_per_post'])
+
+        c2_end = query2[0][4]
+        c2_start = query2[0][3]
+        facebook2 = displayFacebookJSON(facebookName, c2_start+'T00:00:00Z', c2_end+'T00:00:00Z', stats)['FacebookStatisticData']
+
+        # facebook stats for campaign 2
+        fb2 = filterPosts(query2[0][5], facebook2)
+
+        total_likes2 = 0
+        for post in fb2['posts']:
+            total_likes2 += post['post_like_count']
+
+        campaign2_length = datetime.strptime(query2[0][3], "%Y-%m-%d") - datetime.strptime(query2[0][4], "%Y-%m-%d")
+        c_len2 = campaign2_length.days
+        facebook_data2={}
+        facebook_data2['num_posts'] = len(fb2['posts'])
+        print("num posts for campaign 2: ", facebook_data2['num_posts'])
+        facebook_data2['daily_posts'] = round(facebook_data2['num_posts']/c_len2, 2)
+        print("posts made per day for campaign 2: ", facebook_data2['daily_posts'])
+        facebook_data2['avg_react_per_post'] = round(total_likes2/facebook_data2['num_posts'], 2)
+        print("avg reacts per post for campaign 2: ", facebook_data2['avg_react_per_post'])
+
+        return render_template("compareCampaigns.html", c1 = query1, c2 = query2, campaigns=campaigns, facebook_data1=facebook_data1, facebook_data2=facebook_data2)
     return render_template("compareCampaigns.html", c1 = [], c2 = [], campaigns=campaigns)
 
 @app.route('/editCampaign/<campaign_id>', methods=['GET', 'POST'])
@@ -378,11 +427,11 @@ def displayFacebookJSON(page, start, end, stats):
 
     if 'Website' in result:
         result['Website'] = re.sub('.*//', '', result['Website'])
-    
+
     return result
 
 # input: string in the form of "x,y,a" and facebook data as a tuple
-# output: dict of facebook data 
+# output: dict of facebook data
 def filterPosts(searchQuery, facebookData):
     #make sure query is regex friendly
     q = re.sub(r'\s*,\s*', '|', searchQuery, flags=re.IGNORECASE)
@@ -419,8 +468,8 @@ def get_week_comment(page, end , week):
     d = timedelta(weeks=week)
     startdate = enddate - d
     rq_string = create_fb_request(page,startdate, enddate)
-    page_stats = requests.get(rq_string).json() 
-    text = "neutral" 
+    page_stats = requests.get(rq_string).json()
+    text = "neutral"
     if "data" in page_stats:
         for x in page_stats["data"]:
             if "comments" in x:
@@ -428,7 +477,7 @@ def get_week_comment(page, end , week):
                     for y in x["comments"]["data"]:
                         text += y["message"] + "\n" if "message" in y else ""
 
-    # sentiment analysis can only process up to 100k character 
+    # sentiment analysis can only process up to 100k character
     return text[:100000]
 def create_fb_request(page_name, start_time, end_time):
     access_token = os.environ.get('FB_API_KEY')
@@ -444,11 +493,11 @@ def get_all_weeks(page_name,frm,to):
         fromTime += d
     return scores
 
-    
+
 #def get_score_for_week(page_name,time):
 #    from db_helpers import query_db, get_db
 #    query1 = query_db('select score from sentiments where company_name = "%s" and start_date="%s"'%(page_name,time), one=True)
-#    if query1 is None: 
+#    if query1 is None:
 #      comments = get_week_comment(page_name,time, 5)
 #      score = sentiment.get_sentiment(comments)
 #      db = get_db()
